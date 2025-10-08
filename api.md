@@ -254,9 +254,149 @@ tabbycat.api.key=tabbycat.api-key
 
 ---
 
+## 4. Команды
+
+### 4.1 Создать команду
+**POST** `/api/teams`
+
+**Описание:** Создать новую команду (создатель становится лидером)
+
+**Заголовки:**
+- `Authorization: Bearer <JWT_TOKEN>`
+- `Content-Type: application/json`
+
+**Тело запроса:**
+```json
+{
+  "name": "Название команды"
+}
+```
+
+**Ответ:**
+```json
+{
+  "id": 1,
+  "name": "Название команды",
+  "leader": {
+    "id": 1,
+    "username": "testuser",
+    "email": "test@example.com",
+    "fullName": "Test User",
+    "phone": "+1234567890",
+    "description": "Описание пользователя",
+    "profilePicture": "uploads/profile.jpg",
+    "createdAt": "2024-01-01T12:00:00",
+    "updatedAt": "2024-01-01T12:00:00"
+  },
+  "joinCode": "ABC12345",
+  "members": [
+    {
+      "id": 1,
+      "user": {
+        "id": 1,
+        "username": "testuser",
+        "email": "test@example.com",
+        "fullName": "Test User",
+        "phone": "+1234567890",
+        "description": "Описание пользователя",
+        "profilePicture": "uploads/profile.jpg",
+        "createdAt": "2024-01-01T12:00:00",
+        "updatedAt": "2024-01-01T12:00:00"
+      },
+      "joinedAt": "2024-01-01T12:00:00"
+    }
+  ],
+  "createdAt": "2024-01-01T12:00:00",
+  "updatedAt": "2024-01-01T12:00:00",
+  "memberCount": 1,
+  "isFull": false
+}
+```
+
+### 4.2 Вступить в команду
+**POST** `/api/teams/join`
+
+**Описание:** Вступить в команду по коду приглашения
+
+**Заголовки:**
+- `Authorization: Bearer <JWT_TOKEN>`
+- `Content-Type: application/json`
+
+**Тело запроса:**
+```json
+{
+  "joinCode": "ABC12345"
+}
+```
+
+**Ответ:** Аналогично ответу создания команды
+
+### 4.3 Покинуть команду
+**POST** `/api/teams/leave`
+
+**Описание:** Покинуть текущую команду
+
+**Заголовки:**
+- `Authorization: Bearer <JWT_TOKEN>`
+
+**Ответ:**
+```json
+{
+  "id": 1,
+  "name": "Название команды",
+  "leader": {
+    "id": 2,
+    "username": "newleader",
+    "email": "leader@example.com",
+    "fullName": "New Leader",
+    "phone": "+1234567891",
+    "description": "Новый лидер",
+    "profilePicture": null,
+    "createdAt": "2024-01-01T12:00:00",
+    "updatedAt": "2024-01-01T12:00:00"
+  },
+  "joinCode": "ABC12345",
+  "members": [
+    {
+      "id": 2,
+      "user": {
+        "id": 2,
+        "username": "newleader",
+        "email": "leader@example.com",
+        "fullName": "New Leader",
+        "phone": "+1234567891",
+        "description": "Новый лидер",
+        "profilePicture": null,
+        "createdAt": "2024-01-01T12:00:00",
+        "updatedAt": "2024-01-01T12:00:00"
+      },
+      "joinedAt": "2024-01-01T12:00:00"
+    }
+  ],
+  "createdAt": "2024-01-01T12:00:00",
+  "updatedAt": "2024-01-01T12:00:00",
+  "memberCount": 1,
+  "isFull": false
+}
+```
+
+**Примечание:** Если команда остается пустой после выхода лидера, команда удаляется и возвращается сообщение: "Команда удалена (не осталось участников)"
+
+### 4.4 Получить мою команду
+**GET** `/api/teams/my`
+
+**Описание:** Получить информацию о команде текущего пользователя
+
+**Заголовки:**
+- `Authorization: Bearer <JWT_TOKEN>`
+
+**Ответ:** Аналогично ответу создания команды
+
+---
+
 ## Поведение безопасности
 - Открытые маршруты: `/api/auth/**`, `/api/test/public`, `/api/files/**`
-- Защищенные маршруты: `/api/test/**` (кроме public)
+- Защищенные маршруты: `/api/teams/**`, `/api/test/**` (кроме public)
 - Все прочие маршруты требуют аутентификации и действительного JWT.
 - Авторизация по ролям осуществляется через аннотации `@PreAuthorize` на контроллерах.
 
