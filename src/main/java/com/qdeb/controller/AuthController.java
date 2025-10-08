@@ -56,7 +56,10 @@ public class AuthController {
         User user = userService.createUser(
                 signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                signUpRequest.getPassword()
+                signUpRequest.getPassword(),
+                signUpRequest.getFullName(),
+                signUpRequest.getPhone(),
+                signUpRequest.getDescription()
         );
         
         return ResponseEntity.ok("Пользователь успешно зарегистрирован!");

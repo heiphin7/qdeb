@@ -19,11 +19,16 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     
-    public User createUser(String username, String email, String password) {
+    public User createUser(String username, String email, String password, String fullName, 
+                          String phone, String description) {
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setFullName(fullName);
+        user.setPhone(phone);
+        user.setDescription(description);
+        user.setProfilePicture(null); // По умолчанию без фото
         
         // Добавляем роль ROLE_USERS по умолчанию
         Set<Role> roles = new HashSet<>();
@@ -41,5 +46,22 @@ public class UserService {
     
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+    
+    public User updateProfilePicture(Long userId, String profilePicturePath) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        user.setProfilePicture(profilePicturePath);
+        return userRepository.save(user);
+    }
+    
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+    }
+    
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
     }
 }

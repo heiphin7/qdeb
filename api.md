@@ -13,6 +13,9 @@ QDEB API Документация
   - GET `/api/test/user` — доступ для роли `ROLE_USERS`
   - GET `/api/test/admin` — доступ для роли `ROLE_ADMIN`
   - GET `/api/test/profile` — профиль текущего пользователя
+- Файлы и изображения
+  - POST `/api/files/upload/profile-picture` — загрузка фото профиля
+  - GET `/api/files/profile-picture/{fileName}` — получение фото профиля
 
 ---
 
@@ -29,7 +32,10 @@ QDEB API Документация
 {
   "username": "string (3..50)",
   "email": "string (email)",
-  "password": "string (>=6)"
+  "password": "string (>=6)",
+  "fullName": "string (max 100)",
+  "phone": "string (max 20, optional)",
+  "description": "string (max 500, optional)"
 }
 ```
 
@@ -159,8 +165,50 @@ QDEB API Документация
 
 ---
 
+## Файлы и изображения
+
+### POST /api/files/upload/profile-picture
+Загрузка изображения профиля для текущего пользователя.
+
+Заголовки:
+- `Authorization: Bearer <JWT_TOKEN>`
+- `Content-Type: multipart/form-data`
+
+Параметры:
+- `file` — файл изображения (JPG, PNG, GIF, WebP, макс. 10MB)
+
+Ответы:
+- 200 OK — успешная загрузка
+```json
+"Изображение профиля успешно загружено: filename.jpg"
+```
+- 400 Bad Request — неподдерживаемый тип файла
+```json
+"Поддерживаются только изображения (JPG, PNG, GIF)"
+```
+- 401 Unauthorized — отсутствует/невалидный токен
+
+---
+
+### GET /api/files/profile-picture/{fileName}
+Получение изображения профиля по имени файла.
+
+Параметры URL:
+- `fileName` — имя файла изображения
+
+Ответы:
+- 200 OK — возвращает изображение
+- 404 Not Found — файл не найден
+
+Примечания:
+- Этот endpoint публичный, не требует аутентификации
+- Поддерживаемые форматы: JPG, PNG, GIF, WebP
+
+---
+
 ## Поведение безопасности
-- Открытые маршруты: `/api/auth/**`, `/api/test/public`
+- Открытые маршруты: `/api/auth/**`, `/api/test/public`, `/api/files/profile-picture/**`
+- Защищенные маршруты: `/api/files/upload/**`, `/api/test/**` (кроме public)
 - Все прочие маршруты требуют аутентификации и действительного JWT.
 - Авторизация по ролям осуществляется через аннотации `@PreAuthorize` на контроллерах.
 
@@ -176,20 +224,23 @@ QDEB API Документация
 Регистрация:
 ```http
 POST /api/auth/signup HTTP/1.1
-Host: localhost:8080
+Host: localhost:5234
 Content-Type: application/json
 
 {
   "username": "testuser",
   "email": "test@example.com",
-  "password": "password123"
+  "password": "password123",
+  "fullName": "Иван Иванов",
+  "phone": "+7-999-123-45-67",
+  "description": "Разработчик с опытом работы в веб-технологиях"
 }
 ```
 
 Логин и использование токена:
 ```http
 POST /api/auth/signin HTTP/1.1
-Host: localhost:8080
+Host: localhost:5234
 Content-Type: application/json
 
 {
@@ -200,7 +251,23 @@ Content-Type: application/json
 
 ```http
 GET /api/test/user HTTP/1.1
-Host: localhost:8080
+Host: localhost:5234
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+Загрузка фото профиля:
+```http
+POST /api/files/upload/profile-picture HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: multipart/form-data
+
+[file: profile-picture.jpg]
+```
+
+Получение фото профиля:
+```http
+GET /api/files/profile-picture/uuid-filename.jpg HTTP/1.1
+Host: localhost:5234
 ```
 

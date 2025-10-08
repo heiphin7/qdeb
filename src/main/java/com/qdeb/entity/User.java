@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,6 +42,28 @@ public class User implements UserDetails {
     @Size(min = 6)
     @Column(nullable = false)
     private String password;
+    
+    @NotBlank
+    @Size(max = 100)
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
+    
+    @Size(max = 20)
+    @Column(name = "phone")
+    private String phone;
+    
+    @Size(max = 500)
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+    
+    @Column(name = "profile_picture")
+    private String profilePicture;
+    
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
     
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -75,5 +98,16 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }
