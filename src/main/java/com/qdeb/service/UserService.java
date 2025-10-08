@@ -18,9 +18,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TabbycatService tabbycatService;
     
     public User createUser(String username, String email, String password, String fullName, 
                           String phone, String description, String profilePicturePath) {
+        // Сначала создаем пользователя в нашей базе данных
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
@@ -37,7 +39,22 @@ public class UserService {
         roles.add(userRole);
         user.setRoles(roles);
         
-        return userRepository.save(user);
+        // Сохраняем пользователя в нашей базе
+        User savedUser = userRepository.save(user);
+        
+        // Создаем пользователя в Tabbycat
+        try {
+            boolean tabbycatSuccess = tabbycatService.createUser(fullName, email, password);
+            if (!tabbycatSuccess) {
+                // Логируем ошибку, но не прерываем процесс регистрации
+                System.err.println("Предупреждение: Не удалось создать пользователя в Tabbycat для: " + fullName);
+            }
+        } catch (Exception e) {
+            // Логируем ошибку, но не прерываем процесс регистрации
+            System.err.println("Ошибка при создании пользователя в Tabbycat: " + e.getMessage());
+        }
+        
+        return savedUser;
     }
     
     public boolean existsByUsername(String username) {
