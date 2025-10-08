@@ -1,7 +1,7 @@
 QDEB API Документация
 
 Версия: 1.0
-База URL: `http://localhost:5349`
+База URL: `http://localhost:5234`
 Аутентификация: `Bearer <JWT_TOKEN>` в заголовке `Authorization` (кроме публичных/открытых маршрутов)
 
 ## Содержание
