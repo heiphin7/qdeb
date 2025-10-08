@@ -200,13 +200,12 @@ JSON для параметра `register`:
 
 1. **Создается пользователь в локальной базе данных**
 2. **Автоматически создается профиль в Tabbycat** с параметрами:
-   - `username` = `fullName` (полное имя пользователя)
+   - `username` = `username` (имя пользователя из регистрации)
    - `email` = email пользователя
    - `password` = пароль пользователя
    - `is_superuser` = `false`
    - `is_staff` = `false`
    - `is_active` = `true`
-   - `tournaments` = `[]` (пустой массив)
 
 ### Конфигурация Tabbycat
 

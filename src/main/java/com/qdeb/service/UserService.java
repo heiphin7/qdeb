@@ -44,14 +44,12 @@ public class UserService {
         
         // Создаем пользователя в Tabbycat
         try {
-            boolean tabbycatSuccess = tabbycatService.createUser(fullName, email, password);
+            boolean tabbycatSuccess = tabbycatService.createUser(username, email, password);
             if (!tabbycatSuccess) {
-                // Логируем ошибку, но не прерываем процесс регистрации
-                System.err.println("Предупреждение: Не удалось создать пользователя в Tabbycat для: " + fullName);
+                System.err.println("Предупреждение: Tabbycat - пользователь " + username + " не создан");
             }
         } catch (Exception e) {
-            // Логируем ошибку, но не прерываем процесс регистрации
-            System.err.println("Ошибка при создании пользователя в Tabbycat: " + e.getMessage());
+            System.err.println("Ошибка Tabbycat: " + e.getMessage());
         }
         
         return savedUser;
