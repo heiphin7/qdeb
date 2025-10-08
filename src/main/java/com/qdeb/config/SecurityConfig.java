@@ -53,7 +53,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/test/public").permitAll()
-                .requestMatchers("/api/files/profile-picture/**").permitAll()
+                .requestMatchers("/api/files/**").permitAll()
                 .requestMatchers("/api/test/**").authenticated()
                 .anyRequest().authenticated()
             )

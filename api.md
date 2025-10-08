@@ -15,6 +15,7 @@ QDEB API Документация
   - GET `/api/test/profile` — профиль текущего пользователя
 - Файлы и изображения
   - GET `/api/files/profile-picture/{fileName}` — получение фото профиля
+  - GET `/api/files/{fileName}` — получение любого файла из uploads
 
 ---
 
@@ -194,6 +195,40 @@ JSON для параметра `register`:
 
 ---
 
+### GET /api/files/{fileName}
+Получение любого файла из папки uploads по имени файла.
+
+Параметры URL:
+- `fileName` — имя файла (с расширением)
+
+Ответы:
+- 200 OK — возвращает файл с правильным Content-Type
+- 404 Not Found — файл не найден
+- 400 Bad Request — некорректный путь к файлу
+
+Поддерживаемые типы файлов:
+- **Изображения:** JPG, JPEG, PNG, GIF, WebP
+- **Документы:** PDF, TXT, JSON, XML
+- **Архивы:** ZIP
+- **Видео:** MP4
+- **Аудио:** MP3
+- **Остальные:** application/octet-stream
+
+Примеры использования:
+```
+GET /api/files/document.pdf
+GET /api/files/image.png
+GET /api/files/data.json
+GET /api/files/archive.zip
+```
+
+Примечания:
+- Этот endpoint публичный, не требует аутентификации
+- Content-Type определяется автоматически по расширению файла
+- Файлы отображаются в браузере (inline), а не скачиваются
+
+---
+
 ## Интеграция с Tabbycat
 
 Приложение интегрировано с системой Tabbycat для управления турнирами. При регистрации пользователя:
@@ -220,7 +255,7 @@ tabbycat.api.key=tabbycat.api-key
 ---
 
 ## Поведение безопасности
-- Открытые маршруты: `/api/auth/**`, `/api/test/public`, `/api/files/profile-picture/**`
+- Открытые маршруты: `/api/auth/**`, `/api/test/public`, `/api/files/**`
 - Защищенные маршруты: `/api/test/**` (кроме public)
 - Все прочие маршруты требуют аутентификации и действительного JWT.
 - Авторизация по ролям осуществляется через аннотации `@PreAuthorize` на контроллерах.
