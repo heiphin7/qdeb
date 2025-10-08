@@ -14,7 +14,6 @@ QDEB API Документация
   - GET `/api/test/admin` — доступ для роли `ROLE_ADMIN`
   - GET `/api/test/profile` — профиль текущего пользователя
 - Файлы и изображения
-  - POST `/api/files/upload/profile-picture` — загрузка фото профиля
   - GET `/api/files/profile-picture/{fileName}` — получение фото профиля
 
 ---
@@ -22,12 +21,16 @@ QDEB API Документация
 ## Аутентификация
 
 ### POST /api/auth/signup
-Регистрация нового пользователя. По умолчанию присваивается роль `ROLE_USERS`.
+Регистрация нового пользователя с возможностью загрузки фото профиля. По умолчанию присваивается роль `ROLE_USERS`.
 
 Заголовки:
-- `Content-Type: application/json`
+- `Content-Type: multipart/form-data`
 
-Тело запроса:
+Параметры:
+- `register` — JSON строка с данными регистрации
+- `profilePicture` — файл изображения (опционально)
+
+JSON для параметра `register`:
 ```json
 {
   "username": "string (3..50)",
@@ -52,9 +55,15 @@ QDEB API Документация
 ```json
 "Ошибка: Email уже используется!"
 ```
+- 400 Bad Request — неподдерживаемый тип файла
+```json
+"Поддерживаются только изображения (JPG, PNG, GIF, WebP)"
+```
 
 Замечания:
-- Поля `username`, `email`, `password` обязательны.
+- Поля `username`, `email`, `password`, `fullName` обязательны.
+- Поля `phone` и `description` опциональны.
+- Поле `profilePicture` опционально, поддерживаются форматы: JPG, PNG, GIF, WebP (макс. 10MB).
 - Валидация осуществляется на стороне сервера.
 
 ---
@@ -167,29 +176,6 @@ QDEB API Документация
 
 ## Файлы и изображения
 
-### POST /api/files/upload/profile-picture
-Загрузка изображения профиля для текущего пользователя.
-
-Заголовки:
-- `Authorization: Bearer <JWT_TOKEN>`
-- `Content-Type: multipart/form-data`
-
-Параметры:
-- `file` — файл изображения (JPG, PNG, GIF, WebP, макс. 10MB)
-
-Ответы:
-- 200 OK — успешная загрузка
-```json
-"Изображение профиля успешно загружено: filename.jpg"
-```
-- 400 Bad Request — неподдерживаемый тип файла
-```json
-"Поддерживаются только изображения (JPG, PNG, GIF)"
-```
-- 401 Unauthorized — отсутствует/невалидный токен
-
----
-
 ### GET /api/files/profile-picture/{fileName}
 Получение изображения профиля по имени файла.
 
@@ -208,7 +194,7 @@ QDEB API Документация
 
 ## Поведение безопасности
 - Открытые маршруты: `/api/auth/**`, `/api/test/public`, `/api/files/profile-picture/**`
-- Защищенные маршруты: `/api/files/upload/**`, `/api/test/**` (кроме public)
+- Защищенные маршруты: `/api/test/**` (кроме public)
 - Все прочие маршруты требуют аутентификации и действительного JWT.
 - Авторизация по ролям осуществляется через аннотации `@PreAuthorize` на контроллерах.
 
@@ -225,6 +211,10 @@ QDEB API Документация
 ```http
 POST /api/auth/signup HTTP/1.1
 Host: localhost:5234
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="register"
 Content-Type: application/json
 
 {
@@ -235,6 +225,12 @@ Content-Type: application/json
   "phone": "+7-999-123-45-67",
   "description": "Разработчик с опытом работы в веб-технологиях"
 }
+--boundary
+Content-Disposition: form-data; name="profilePicture"; filename="profile.jpg"
+Content-Type: image/jpeg
+
+[binary data]
+--boundary--
 ```
 
 Логин и использование токена:
@@ -253,16 +249,6 @@ Content-Type: application/json
 GET /api/test/user HTTP/1.1
 Host: localhost:5234
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-Загрузка фото профиля:
-```http
-POST /api/files/upload/profile-picture HTTP/1.1
-Host: localhost:5234
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: multipart/form-data
-
-[file: profile-picture.jpg]
 ```
 
 Получение фото профиля:

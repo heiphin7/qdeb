@@ -20,7 +20,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     
     public User createUser(String username, String email, String password, String fullName, 
-                          String phone, String description) {
+                          String phone, String description, String profilePicturePath) {
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
@@ -28,7 +28,7 @@ public class UserService {
         user.setFullName(fullName);
         user.setPhone(phone);
         user.setDescription(description);
-        user.setProfilePicture(null); // По умолчанию без фото
+        user.setProfilePicture(profilePicturePath);
         
         // Добавляем роль ROLE_USERS по умолчанию
         Set<Role> roles = new HashSet<>();
