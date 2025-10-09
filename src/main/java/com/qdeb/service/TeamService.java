@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -141,20 +140,11 @@ public class TeamService {
     }
     
     private TeamResponse convertToTeamResponse(Team team) {
-        List<TeamMemberResponse> members = team.getMembers().stream()
-                .map(member -> new TeamMemberResponse(
-                        member.getId(),
-                        member.getUser(),
-                        member.getJoinedAt()
-                ))
-                .collect(Collectors.toList());
-        
         return new TeamResponse(
                 team.getId(),
                 team.getName(),
                 team.getLeader(),
                 team.getJoinCode(),
-                members,
                 team.getCreatedAt(),
                 team.getUpdatedAt(),
                 team.getMemberCount(),

@@ -289,23 +289,6 @@ tabbycat.api.key=tabbycat.api-key
     "updatedAt": "2024-01-01T12:00:00"
   },
   "joinCode": "ABC12345",
-  "members": [
-    {
-      "id": 1,
-      "user": {
-        "id": 1,
-        "username": "testuser",
-        "email": "test@example.com",
-        "fullName": "Test User",
-        "phone": "+1234567890",
-        "description": "Описание пользователя",
-        "profilePicture": "uploads/profile.jpg",
-        "createdAt": "2024-01-01T12:00:00",
-        "updatedAt": "2024-01-01T12:00:00"
-      },
-      "joinedAt": "2024-01-01T12:00:00"
-    }
-  ],
   "createdAt": "2024-01-01T12:00:00",
   "updatedAt": "2024-01-01T12:00:00",
   "memberCount": 1,
@@ -356,23 +339,6 @@ tabbycat.api.key=tabbycat.api-key
     "updatedAt": "2024-01-01T12:00:00"
   },
   "joinCode": "ABC12345",
-  "members": [
-    {
-      "id": 2,
-      "user": {
-        "id": 2,
-        "username": "newleader",
-        "email": "leader@example.com",
-        "fullName": "New Leader",
-        "phone": "+1234567891",
-        "description": "Новый лидер",
-        "profilePicture": null,
-        "createdAt": "2024-01-01T12:00:00",
-        "updatedAt": "2024-01-01T12:00:00"
-      },
-      "joinedAt": "2024-01-01T12:00:00"
-    }
-  ],
   "createdAt": "2024-01-01T12:00:00",
   "updatedAt": "2024-01-01T12:00:00",
   "memberCount": 1,
