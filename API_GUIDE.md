@@ -96,6 +96,11 @@ GET /api/test/profile
 Authorization: Bearer <JWT_TOKEN>
 ```
 
+#### Публичный профиль пользователя по username
+```
+GET /api/profile/{username}
+```
+
 ## Роли
 
 - `ROLE_USERS` - Базовая роль для всех зарегистрированных пользователей

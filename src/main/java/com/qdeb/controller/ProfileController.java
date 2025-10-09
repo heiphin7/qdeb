@@ -37,6 +37,16 @@ public class ProfileController {
         }
     }
     
+    @GetMapping("/users/{username}")
+    public ResponseEntity<?> getUserProfileByUsername(@PathVariable String username) {
+        try {
+            UserProfileResponse profile = userService.getUserProfileByUsername(username);
+            return ResponseEntity.ok(profile);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка при получении профиля: " + e.getMessage());
+        }
+    }
+    
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();

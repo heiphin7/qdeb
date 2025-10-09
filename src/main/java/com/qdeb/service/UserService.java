@@ -88,8 +88,8 @@ public class UserService {
     public UserProfileResponse getUserProfile(Long userId) {
         User user = getUserById(userId);
         
-        // Находим команду пользователя
-        Optional<Team> team = teamRepository.findByUserId(userId);
+        // Находим команду пользователя (как лидера или как участника)
+        Optional<Team> team = findUserTeam(userId);
         
         return new UserProfileResponse(user, team.orElse(null));
     }
@@ -97,9 +97,20 @@ public class UserService {
     public UserProfileResponse getUserProfileByUsername(String username) {
         User user = getUserByUsername(username);
         
-        // Находим команду пользователя
-        Optional<Team> team = teamRepository.findByUserId(user.getId());
+        // Находим команду пользователя (как лидера или как участника)
+        Optional<Team> team = findUserTeam(user.getId());
         
         return new UserProfileResponse(user, team.orElse(null));
+    }
+    
+    private Optional<Team> findUserTeam(Long userId) {
+        // Сначала проверяем, является ли пользователь лидером команды
+        Optional<Team> leaderTeam = teamRepository.findByLeaderId(userId);
+        if (leaderTeam.isPresent()) {
+            return leaderTeam;
+        }
+        
+        // Если не лидер, проверяем, является ли участником команды
+        return teamRepository.findByUserId(userId);
     }
 }

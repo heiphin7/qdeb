@@ -293,10 +293,9 @@ tabbycat.api.key=tabbycat.api-key
 ### 4.2 Получить профиль по username
 **GET** `/api/profile/{username}`
 
-**Описание:** Получить профиль пользователя по его username
+**Описание:** Получить профиль пользователя по его username (публичный endpoint)
 
-**Заголовки:**
-- `Authorization: Bearer <JWT_TOKEN>`
+**Заголовки:** Не требуются
 
 **Параметры URL:**
 - `username` — имя пользователя

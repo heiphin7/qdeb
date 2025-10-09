@@ -27,7 +27,7 @@ public class UserProfileResponse {
         this.fullName = user.getFullName();
         this.phone = user.getPhone();
         this.description = user.getDescription();
-        this.profilePicture = user.getProfilePicture();
+        this.profilePicture = buildProfilePictureUrl(user.getProfilePicture());
         this.createdAt = user.getCreatedAt();
         this.updatedAt = user.getUpdatedAt();
         
@@ -36,6 +36,14 @@ public class UserProfileResponse {
         } else {
             this.team = null;
         }
+    }
+    
+    private String buildProfilePictureUrl(String profilePicture) {
+        if (profilePicture == null || profilePicture.isEmpty()) {
+            return null;
+        }
+        // Возвращаем полный URL для доступа к изображению
+        return "/api/files/" + profilePicture;
     }
     
     @Data
@@ -47,6 +55,7 @@ public class UserProfileResponse {
         private int memberCount;
         private boolean isFull;
         private LocalDateTime joinedAt;
+        private Long memberId; // ID второго участника команды (если есть)
         
         public TeamInfo(Team team, User user) {
             this.id = team.getId();
@@ -59,6 +68,13 @@ public class UserProfileResponse {
             if (team.getLeader().getId().equals(user.getId())) {
                 this.role = "LEADER";
                 this.joinedAt = team.getCreatedAt(); // Лидер присоединился при создании команды
+                
+                // Если пользователь лидер, ищем ID второго участника
+                this.memberId = team.getMembers().stream()
+                        .filter(member -> !member.getUser().getId().equals(user.getId()))
+                        .findFirst()
+                        .map(member -> member.getUser().getId())
+                        .orElse(null);
             } else {
                 this.role = "MEMBER";
                 // Найдем дату присоединения из TeamMember
@@ -67,6 +83,9 @@ public class UserProfileResponse {
                         .findFirst()
                         .map(member -> member.getJoinedAt())
                         .orElse(null);
+                
+                // Если пользователь участник, то второй участник - это лидер
+                this.memberId = team.getLeader().getId();
             }
         }
     }
