@@ -475,3 +475,276 @@ GET /api/files/profile-picture/uuid-filename.jpg HTTP/1.1
 Host: localhost:5234
 ```
 
+---
+
+## 6. Турниры
+
+### 6.1 Создать турнир
+**POST** `/api/tournaments`
+
+**Описание:** Создать новый турнир с полной интеграцией в Tabbycat
+
+**Заголовки:**
+- `Authorization: Bearer <JWT_TOKEN>`
+- `Content-Type: application/json`
+
+**Тело запроса:**
+```json
+{
+  "name": "test1",
+  "slug": "test1",
+  "organizerName": "someOrganizer",
+  "organizerContance": "some@gmail.com",
+  "description": "best tournament in the world",
+  "date": "2025-12-31",
+  "active": true,
+  "fee": 500,
+  "level": "NATIONAL",
+  "format": "online",
+  "seq": 1,
+  "registraionFields": [
+    {
+      "name": "Full Name",
+      "type": "DESCRIPTION",
+      "required": true
+    },
+    {
+      "name": "Work or College",
+      "type": "DESCRIPTION",
+      "required": true
+    }
+  ],
+  "rounds": [
+    {
+      "break_category": "",
+      "starts_at": "2025-12-31T10:00:00",
+      "seq": 1,
+      "completed": false,
+      "name": "Раунд 1",
+      "abbreviation": "R1",
+      "stage": "P",
+      "draw_type": "R",
+      "draw_status": "N",
+      "feedback_weight": 0.1,
+      "silent": false,
+      "motions_released": false,
+      "weight": 1
+    }
+  ]
+}
+```
+
+**Параметры:**
+- `name` — название турнира
+- `slug` — уникальный идентификатор турнира (URL-friendly)
+- `organizerName` — имя организатора
+- `organizerContact` — контактная информация организатора
+- `description` — описание турнира
+- `date` — дата проведения турнира (YYYY-MM-DD)
+- `active` — активен ли турнир
+- `fee` — стоимость участия
+- `level` — уровень турнира (NATIONAL, REGIONAL, INTERNATIONAL, LOCAL)
+- `format` — формат проведения (online, offline)
+- `seq` — порядковый номер
+- `registraionFields` — массив полей регистрации
+  - `name` — название поля
+  - `type` — тип поля (DESCRIPTION, TEXT)
+  - `required` — обязательное ли поле
+- `rounds` — массив раундов турнира
+  - `break_category` — категория брейка (может быть пустой)
+  - `starts_at` — время начала раунда (ISO 8601)
+  - `seq` — порядковый номер раунда
+  - `completed` — завершен ли раунд
+  - `name` — название раунда (до 40 символов)
+  - `abbreviation` — аббревиатура раунда (до 10 символов)
+  - `stage` — стадия раунда (P - Отборочные, E - Брейковый)
+  - `draw_type` — тип сетки (R - Случайный, M - Ручной, D - Раунд-Робин, P - По силе команд, E - Брейковый, S - Seeded)
+  - `draw_status` — статус сетки (N - Нет, D - Черновик, C - Подтвержденные, R - Выпущено)
+  - `feedback_weight` — вес обратной связи (0.0-1.0)
+  - `silent` — скрытый ли раунд
+  - `motions_released` — опубликованы ли темы
+  - `weight` — коэффициент очков
+
+**Ответ:**
+```json
+{
+  "id": 1,
+  "name": "test1",
+  "slug": "test1",
+  "organizerName": "someOrganizer",
+  "organizerContact": "some@gmail.com",
+  "description": "best tournament in the world",
+  "date": "2025-12-31",
+  "active": true,
+  "fee": 500,
+  "level": "NATIONAL",
+  "format": "online",
+  "seq": 1,
+  "createdAt": "2025-01-10T12:00:00",
+  "updatedAt": "2025-01-10T12:00:00",
+  "registrationFields": [
+    {
+      "id": 1,
+      "name": "Full Name",
+      "type": "DESCRIPTION",
+      "required": true
+    }
+  ],
+  "rounds": [
+    {
+      "id": 1,
+      "name": "Раунд 1",
+      "abbreviation": "R1",
+      "seq": 1,
+      "stage": "P",
+      "drawType": "R",
+      "drawStatus": "N",
+      "breakCategory": null,
+      "startsAt": "2025-12-31T10:00:00",
+      "completed": false,
+      "feedbackWeight": 0.1,
+      "silent": false,
+      "motionsReleased": false,
+      "weight": 1
+    }
+  ]
+}
+```
+
+**Примечания:**
+- При создании турнира автоматически создается соответствующий турнир в системе Tabbycat
+- Для каждого раунда создается соответствующий раунд в Tabbycat
+- Поле `motions` в раундах Tabbycat всегда устанавливается как пустой массив
+- Все операции логируются для отслеживания процесса создания
+
+**Логирование:**
+Система ведет подробное логирование всех операций:
+- Получение запроса на создание турнира
+- Сохранение данных в локальную базу данных
+- Отправка запросов в Tabbycat API
+- Результаты создания турнира и раундов
+- Ошибки и исключения
+
+---
+
+Вот общий json который мы принимаем, вот тут пожалуйста обрати внимание на типа registraion fields, типа видишь что у нас есть вот динамическое добавление полей, получается вот нужно тебе как то тоже сохранять чтобы вот в будушем когда у нас будем делать чтобы это учитывалось, чисто так чтобы ты в конекст себе записал:
+{
+    "name": "test1",
+    "slug": "test1",
+    "organizerName": "someOrganizer",
+    "organizerContance": "some@gmail.com",
+    "description": "best tournament in the world",
+    "date": "2025-12-31",
+    "active": true,
+    "fee": 500,
+    "level": "NATIONAL", // Здесь получается типа national, regional и так далее, добавь enum
+    "format": "online",
+    "seq": 1,
+    "registraionFields": [
+        {
+            "name": "Full Name",
+            "type": "DESCRIPTION",
+            "required": true
+        },
+        {
+            "name": "Work or College",
+            "type": "DESCRIPTION", # тут типа description or text
+            "required": true
+        }
+    ],
+    "rounds": [ // раундов может быть несколько
+      {
+        "break_category": "" // string or null <uri>
+
+        "starts_at": "" // string or null <date-time>
+
+        seq": "integer (Порядковый номер)" // Число, определяющее номер раунда, должно рассчитывать последовательно от 1 для первого раунда
+
+        "completed": "" // Верно есть раунд завершен, что обычно означает, что все результаты были введены и подтверждены
+
+        "name": "" // string (Название) <= 40 characters например, "Раунд 1"
+
+        "abbreviation": "" // string (Аббревиатура) <= 10 charactersнапример, "R1"
+
+        "stage": "" // string (Стадия)
+        Enum: "P" "E"
+        Отборочные=раунды до брейка, брейковые=раунды плей/офф
+
+        P - Отборочные
+        E - Брейковый
+
+
+        "draw_type": "" // string (Тип сетки)
+        Enum: "R" "M" "D" "P" "E" "S"
+        Какой метод составления сетки использовать
+
+        R - Случайный
+        M - Ручной
+        D - Раунд-Робин
+        P - Сочетание по силе команд
+        E - Брейковый
+        S - Seeded
+
+        "draw_status	": "" // string (Статус сетки)
+        Enum: "N" "D" "C" "R"
+        Статус сетки на этот раунд
+
+        N - Нет
+        D - Черновик
+        C - Подтвержденные
+        R - Выпущено
+
+        "feedback_weight": "" // number <double> (Вес обратной связи)
+        Насколько рейтинг судьи зависит от обратной связи и исходного рейтинга. При значении "0" рейтинг судьи на 100% соответствует исходному рейтингу, при значении "1" он на 100% соответствует среднему значению обратной связи.
+
+        "silent": "" // boolean: Если раунд отмечен как закрытый, вся информация о нем (например, его результаты) не будет показана публично.
+
+        "motions_released": "" // boolean (Темы опубликованы)
+        Будет ли появляться темы на сайте публично, если включить эту функци
+
+        "weight": "" // integer
+        A factor for the points received in the round. For example, if 2, all points are doubled.
+      }
+    ]
+}
+
+Вот видишь какую огромную информацию мы получаем, окей будет POST endpoint где мы получим все это и далее нужно:
+
+сохранить в НАШУ базу данных и также сделать вот запросы на создание именно внутри tabbycat, тоесть под еще одним апишкой, вот данные для этих типа берешь вот от основного запроса:
+
+POST http://localhost:8000/api/v1/tournaments
+
+body:
+
+{
+  "name": "string",
+  "short_name": "string",
+  "seq": -2147483648,
+  "slug": "^-$",
+  "active": true
+}
+
+Далее вот типа сколько раундов добавлено, столько вот нужно сделать запросов, то есть если у нас там 3 раунда было указано при создании основного запроса то тогда столько вот запросов нужно будет:
+
+POST http://localhost:8000/api/v1/tournaments/{tournament_slug}/rounds
+
+(Здесь сделай пожалуйста motion пустым всегда)
+
+{
+"break_category": "http://example.com",
+"motions": [],
+"starts_at": "2019-08-24T14:15:22Z",
+"seq": 2147483647,
+"completed": true,
+"name": "string",
+"abbreviation": "string",
+"stage": "P",
+"draw_type": "R",
+"draw_status": "N",
+"feedback_weight": 0.1,
+"silent": true,
+"motions_released": true,
+"weight": -2147483648
+}
+
+также пожалуйста сделай логгирование в файле api.md, просто добавь в конец, оттуда ничего не урезай и также сделай тщательное логгирование пожалуйста
