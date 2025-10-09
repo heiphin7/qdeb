@@ -1,14 +1,18 @@
 package com.qdeb.service;
 
+import com.qdeb.dto.UserProfileResponse;
 import com.qdeb.entity.Role;
+import com.qdeb.entity.Team;
 import com.qdeb.entity.User;
 import com.qdeb.repository.RoleRepository;
+import com.qdeb.repository.TeamRepository;
 import com.qdeb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -19,6 +23,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final TabbycatService tabbycatService;
+    private final TeamRepository teamRepository;
     
     public User createUser(String username, String email, String password, String fullName, 
                           String phone, String description, String profilePicturePath) {
@@ -78,5 +83,23 @@ public class UserService {
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+    }
+    
+    public UserProfileResponse getUserProfile(Long userId) {
+        User user = getUserById(userId);
+        
+        // Находим команду пользователя
+        Optional<Team> team = teamRepository.findByUserId(userId);
+        
+        return new UserProfileResponse(user, team.orElse(null));
+    }
+    
+    public UserProfileResponse getUserProfileByUsername(String username) {
+        User user = getUserByUsername(username);
+        
+        // Находим команду пользователя
+        Optional<Team> team = teamRepository.findByUserId(user.getId());
+        
+        return new UserProfileResponse(user, team.orElse(null));
     }
 }
