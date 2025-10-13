@@ -3,6 +3,7 @@ package com.qdeb.controller;
 import com.qdeb.dto.TournamentApplicationRequest;
 import com.qdeb.dto.TournamentApplicationResponse;
 import com.qdeb.dto.TournamentApplicationDetailResponse;
+import com.qdeb.entity.ApplicationStatus;
 import com.qdeb.service.TournamentApplicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,12 +59,26 @@ public class TournamentApplicationController {
     }
     
     @GetMapping("/{tournamentSlug}/applications")
-    public ResponseEntity<?> getApplicationsByTournamentSlug(@PathVariable String tournamentSlug) {
+    public ResponseEntity<?> getApplicationsByTournamentSlug(
+            @PathVariable String tournamentSlug,
+            @RequestParam(value = "status", required = false) String status) {
         try {
-            log.info("Получен запрос на получение заявок для турнира: {}", tournamentSlug);
+            log.info("Получен запрос на получение заявок для турнира: {}, статус: {}", tournamentSlug, status);
             
-            List<TournamentApplicationDetailResponse> applications = 
-                    applicationService.getApplicationsByTournamentSlug(tournamentSlug);
+            List<TournamentApplicationDetailResponse> applications;
+            
+            if (status != null && !status.trim().isEmpty()) {
+                try {
+                    ApplicationStatus applicationStatus = ApplicationStatus.valueOf(status.toUpperCase());
+                    applications = applicationService.getApplicationsByTournamentSlug(tournamentSlug, applicationStatus);
+                } catch (IllegalArgumentException e) {
+                    log.warn("Некорректный статус заявки: {}", status);
+                    return ResponseEntity.badRequest()
+                            .body("Некорректный статус заявки. Доступные статусы: PENDING, APPROVED, REJECTED");
+                }
+            } else {
+                applications = applicationService.getApplicationsByTournamentSlug(tournamentSlug);
+            }
             
             log.info("Успешно получено {} заявок для турнира {}", applications.size(), tournamentSlug);
             

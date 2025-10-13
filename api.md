@@ -411,13 +411,19 @@ tabbycat.api.key=tabbycat.api-key
 ### 5.5 Получить заявки команды
 **GET** `/api/teams/{teamId}/applications`
 
-**Описание:** Получить все заявки, поданные командой на различные турниры
+**Описание:** Получить все заявки, поданные командой на различные турниры с возможностью фильтрации по статусу
 
 **Заголовки:**
 - `Authorization: Bearer <JWT_TOKEN>`
 
 **Параметры URL:**
 - `teamId` — ID команды
+
+**Параметры запроса:**
+- `status` — статус заявки для фильтрации (опционально)
+  - `PENDING` — ожидающие рассмотрения
+  - `APPROVED` — принятые
+  - `REJECTED` — отклоненные
 
 **Ответы:**
 - 200 OK — список заявок команды
@@ -493,6 +499,41 @@ tabbycat.api.key=tabbycat.api-key
 - 404 Not Found — команда не найдена
 ```json
 "Команда не найдена"
+```
+
+- 400 Bad Request — некорректный статус
+```json
+"Некорректный статус заявки. Доступные статусы: PENDING, APPROVED, REJECTED"
+```
+
+**Примеры использования:**
+
+Получить все заявки команды:
+```http
+GET /api/teams/1/applications HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer <JWT_TOKEN>
+```
+
+Получить только ожидающие заявки команды:
+```http
+GET /api/teams/1/applications?status=PENDING HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer <JWT_TOKEN>
+```
+
+Получить только принятые заявки команды:
+```http
+GET /api/teams/1/applications?status=APPROVED HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer <JWT_TOKEN>
+```
+
+Получить только отклоненные заявки команды:
+```http
+GET /api/teams/1/applications?status=REJECTED HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Параметры ответа:**
@@ -1227,13 +1268,19 @@ Content-Type: image/jpeg
 ### 6.4 Получить заявки на турнир
 **GET** `/api/tournaments/{tournamentSlug}/applications`
 
-**Описание:** Получить все заявки, поданные на турнир по его slug
+**Описание:** Получить все заявки, поданные на турнир по его slug с возможностью фильтрации по статусу
 
 **Заголовки:**
 - `Authorization: Bearer <JWT_TOKEN>`
 
 **Параметры URL:**
 - `tournamentSlug` — slug турнира
+
+**Параметры запроса:**
+- `status` — статус заявки для фильтрации (опционально)
+  - `PENDING` — ожидающие рассмотрения
+  - `APPROVED` — принятые
+  - `REJECTED` — отклоненные
 
 **Ответы:**
 - 200 OK — список заявок
@@ -1307,6 +1354,41 @@ Content-Type: image/jpeg
 - 404 Not Found — турнир не найден
 ```json
 "Турнир не найден"
+```
+
+- 400 Bad Request — некорректный статус
+```json
+"Некорректный статус заявки. Доступные статусы: PENDING, APPROVED, REJECTED"
+```
+
+**Примеры использования:**
+
+Получить все заявки на турнир:
+```http
+GET /api/tournaments/test1/applications HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer <JWT_TOKEN>
+```
+
+Получить только ожидающие заявки:
+```http
+GET /api/tournaments/test1/applications?status=PENDING HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer <JWT_TOKEN>
+```
+
+Получить только принятые заявки:
+```http
+GET /api/tournaments/test1/applications?status=APPROVED HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer <JWT_TOKEN>
+```
+
+Получить только отклоненные заявки:
+```http
+GET /api/tournaments/test1/applications?status=REJECTED HTTP/1.1
+Host: localhost:5234
+Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Параметры ответа:**

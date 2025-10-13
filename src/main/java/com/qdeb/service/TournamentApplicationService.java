@@ -151,16 +151,25 @@ public class TournamentApplicationService {
     }
     
     public List<TournamentApplicationDetailResponse> getApplicationsByTournamentSlug(String tournamentSlug) {
-        log.info("Получение заявок для турнира с slug: {}", tournamentSlug);
+        return getApplicationsByTournamentSlug(tournamentSlug, null);
+    }
+    
+    public List<TournamentApplicationDetailResponse> getApplicationsByTournamentSlug(String tournamentSlug, ApplicationStatus status) {
+        log.info("Получение заявок для турнира с slug: {}, статус: {}", tournamentSlug, status);
         
         // Находим турнир по slug
         Tournament tournament = tournamentRepository.findBySlug(tournamentSlug)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Турнир не найден"));
         
-        // Получаем все заявки на этот турнир
-        List<TournamentApplication> applications = applicationRepository.findByTournamentId(tournament.getId());
-        
-        log.info("Найдено {} заявок для турнира {}", applications.size(), tournamentSlug);
+        // Получаем заявки на этот турнир с фильтрацией по статусу
+        List<TournamentApplication> applications;
+        if (status != null) {
+            applications = applicationRepository.findByTournamentIdAndStatus(tournament.getId(), status);
+            log.info("Найдено {} заявок для турнира {} со статусом {}", applications.size(), tournamentSlug, status);
+        } else {
+            applications = applicationRepository.findByTournamentId(tournament.getId());
+            log.info("Найдено {} заявок для турнира {}", applications.size(), tournamentSlug);
+        }
         
         // Преобразуем в DTO
         return applications.stream()
@@ -254,16 +263,25 @@ public class TournamentApplicationService {
     }
     
     public List<TournamentApplicationDetailResponse> getApplicationsByTeamId(Long teamId) {
-        log.info("Получение заявок для команды с ID: {}", teamId);
+        return getApplicationsByTeamId(teamId, null);
+    }
+    
+    public List<TournamentApplicationDetailResponse> getApplicationsByTeamId(Long teamId, ApplicationStatus status) {
+        log.info("Получение заявок для команды с ID: {}, статус: {}", teamId, status);
         
         // Проверяем, что команда существует
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Команда не найдена"));
         
-        // Получаем все заявки этой команды
-        List<TournamentApplication> applications = applicationRepository.findByTeamId(teamId);
-        
-        log.info("Найдено {} заявок для команды {}", applications.size(), teamId);
+        // Получаем заявки этой команды с фильтрацией по статусу
+        List<TournamentApplication> applications;
+        if (status != null) {
+            applications = applicationRepository.findByTeamIdAndStatus(teamId, status);
+            log.info("Найдено {} заявок для команды {} со статусом {}", applications.size(), teamId, status);
+        } else {
+            applications = applicationRepository.findByTeamId(teamId);
+            log.info("Найдено {} заявок для команды {}", applications.size(), teamId);
+        }
         
         // Преобразуем в DTO
         return applications.stream()

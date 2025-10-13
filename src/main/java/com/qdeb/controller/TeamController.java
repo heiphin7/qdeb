@@ -1,6 +1,7 @@
 package com.qdeb.controller;
 
 import com.qdeb.dto.*;
+import com.qdeb.entity.ApplicationStatus;
 import com.qdeb.entity.User;
 import com.qdeb.service.TeamService;
 import com.qdeb.service.TournamentApplicationService;
@@ -74,9 +75,11 @@ public class TeamController {
     }
     
     @GetMapping("/{teamId}/applications")
-    public ResponseEntity<?> getTeamApplications(@PathVariable Long teamId) {
+    public ResponseEntity<?> getTeamApplications(
+            @PathVariable Long teamId,
+            @RequestParam(value = "status", required = false) String status) {
         try {
-            log.info("Получен запрос на получение заявок для команды: {}", teamId);
+            log.info("Получен запрос на получение заявок для команды: {}, статус: {}", teamId, status);
             
             // Получаем текущего пользователя для проверки прав доступа
             User currentUser = getCurrentUser();
@@ -90,8 +93,20 @@ public class TeamController {
                         .body("У вас нет доступа к заявкам этой команды");
             }
             
-            List<TournamentApplicationDetailResponse> applications = 
-                    applicationService.getApplicationsByTeamId(teamId);
+            List<TournamentApplicationDetailResponse> applications;
+            
+            if (status != null && !status.trim().isEmpty()) {
+                try {
+                    ApplicationStatus applicationStatus = ApplicationStatus.valueOf(status.toUpperCase());
+                    applications = applicationService.getApplicationsByTeamId(teamId, applicationStatus);
+                } catch (IllegalArgumentException e) {
+                    log.warn("Некорректный статус заявки: {}", status);
+                    return ResponseEntity.badRequest()
+                            .body("Некорректный статус заявки. Доступные статусы: PENDING, APPROVED, REJECTED");
+                }
+            } else {
+                applications = applicationService.getApplicationsByTeamId(teamId);
+            }
             
             log.info("Успешно получено {} заявок для команды {}", applications.size(), teamId);
             
