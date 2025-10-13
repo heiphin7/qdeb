@@ -858,13 +858,15 @@ POST http://localhost:8000/api/v1/tournaments/{tournament_slug}/teams
 - `email` = email пользователя
 - `phone` = телефон пользователя
 - `code_name` = username пользователя
-- `gender` = гендер пользователя (`M`, `F`, `O`)
+- `gender` = **реальный гендер пользователя из профиля** (`M`, `F`, `O`)
 - `pronoun` = `null`
 - `anonymous` = `true`
 - `categories` = `[]`
 - `answers` = `[]`
 - `barcode` = `null`
 - `url_key` = `null`
+
+**Важно:** Гендер спикера теперь берется из профиля пользователя, указанного при регистрации, а не жестко задается как "O".
 
 **Обработка ошибок:**
 - Ошибки интеграции с Tabbycat логируются, но не прерывают процесс принятия заявки
@@ -883,8 +885,11 @@ tabbycat.api.key=db0388ad46a02252055ecfc5e1fc8caf17e17a84
 INFO  - Создание команды в Tabbycat для принятой заявки 1
 INFO  - Отправка запроса в Tabbycat: http://localhost:8000/api/v1/tournaments/test3/teams
 INFO  - Данные команды: reference=Devs, speakers=2
-INFO  - Создан спикер: name=User1, lastName=User1, email=user1@gmail.com, username=user1
-INFO  - Создан спикер: name=User2, lastName=User2, email=user2@gmail.com, username=user2
+INFO  - Построен запрос для Tabbycat: команда=Devs, спикеров=2, гендеры=[Спикер 1: M, Спикер 2: F]
+INFO  - Создан спикер: name=User1, lastName=User1, email=user1@gmail.com, username=user1, gender=M (из профиля пользователя)
+INFO  - Создан спикер: name=User2, lastName=User2, email=user2@gmail.com, username=user2, gender=F (из профиля пользователя)
+INFO  - Спикер 1: name=User1, lastName=User1, email=user1@gmail.com, gender=M
+INFO  - Спикер 2: name=User2, lastName=User2, email=user2@gmail.com, gender=F
 INFO  - Команда успешно создана в Tabbycat для заявки 1
 ```
 

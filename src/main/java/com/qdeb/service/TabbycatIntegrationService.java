@@ -47,6 +47,16 @@ public class TabbycatIntegrationService {
                     request.getReference(), 
                     request.getSpeakers() != null ? request.getSpeakers().size() : 0);
             
+            // Логируем детали спикеров для отладки
+            if (request.getSpeakers() != null) {
+                for (int i = 0; i < request.getSpeakers().size(); i++) {
+                    TabbycatTeamRequest.Speaker speaker = request.getSpeakers().get(i);
+                    log.info("Спикер {}: name={}, lastName={}, email={}, gender={}", 
+                            i + 1, speaker.getName(), speaker.getLastName(), 
+                            speaker.getEmail(), speaker.getGender());
+                }
+            }
+            
             ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
             
             if (response.getStatusCode().is2xxSuccessful()) {
@@ -102,8 +112,18 @@ public class TabbycatIntegrationService {
         
         request.setSpeakers(speakers);
         
-        log.info("Построен запрос для Tabbycat: команда={}, спикеров={}", 
-                teamName, speakers.size());
+        // Логируем детали о гендерах спикеров
+        StringBuilder genderInfo = new StringBuilder();
+        for (int i = 0; i < speakers.size(); i++) {
+            TabbycatTeamRequest.Speaker speaker = speakers.get(i);
+            genderInfo.append("Спикер ").append(i + 1).append(": ").append(speaker.getGender());
+            if (i < speakers.size() - 1) {
+                genderInfo.append(", ");
+            }
+        }
+        
+        log.info("Построен запрос для Tabbycat: команда={}, спикеров={}, гендеры=[{}]", 
+                teamName, speakers.size(), genderInfo.toString());
         
         return request;
     }
@@ -116,12 +136,15 @@ public class TabbycatIntegrationService {
         String firstName = nameParts.length > 1 ? nameParts[1] : nameParts[0];
         String lastName = nameParts.length > 1 ? nameParts[0] : "";
         
+        // Получаем гендер пользователя
+        String userGender = user.getGender() != null ? user.getGender().name() : "O";
+        
         speaker.setName(firstName);
         speaker.setLastName(lastName);
         speaker.setEmail(user.getEmail());
         speaker.setPhone(user.getPhone());
         speaker.setCodeName(user.getUsername());
-        speaker.setGender(user.getGender().name()); // Используем реальный гендер пользователя
+        speaker.setGender(userGender); // Используем реальный гендер пользователя
         speaker.setPronoun(null);
         speaker.setAnonymous(true);
         speaker.setBarcode(null);
@@ -129,8 +152,8 @@ public class TabbycatIntegrationService {
         speaker.setCategories(new ArrayList<>());
         speaker.setAnswers(new ArrayList<>());
         
-        log.info("Создан спикер: name={}, lastName={}, email={}, username={}, gender={}", 
-                firstName, lastName, user.getEmail(), user.getUsername(), user.getGender());
+        log.info("Создан спикер: name={}, lastName={}, email={}, username={}, gender={} (из профиля пользователя)", 
+                firstName, lastName, user.getEmail(), user.getUsername(), userGender);
         
         return speaker;
     }
