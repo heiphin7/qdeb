@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,9 +28,10 @@ public class TournamentService {
     private final RoundRepository roundRepository;
     private final RegistrationFieldRepository registrationFieldRepository;
     private final TabbycatTournamentService tabbycatTournamentService;
+    private final FileStorageService fileStorageService;
     
     @Transactional
-    public Tournament createTournament(CreateTournamentRequest request) {
+    public Tournament createTournament(CreateTournamentRequest request, MultipartFile tournamentPicture) {
         log.info("Начало создания турнира: {}", request.getName());
         
         // Проверяем, что slug уникален
@@ -50,6 +52,18 @@ public class TournamentService {
         tournament.setLevel(request.getLevel());
         tournament.setFormat(request.getFormat());
         tournament.setSeq(request.getSeq());
+        
+        // Обрабатываем фотографию турнира
+        if (tournamentPicture != null && !tournamentPicture.isEmpty()) {
+            try {
+                String fileName = fileStorageService.storeFile(tournamentPicture);
+                tournament.setTournamentPicture(fileName);
+                log.info("Фотография турнира сохранена: {}", fileName);
+            } catch (Exception e) {
+                log.error("Ошибка при сохранении фотографии турнира: {}", e.getMessage());
+                throw new RuntimeException("Ошибка при сохранении фотографии турнира: " + e.getMessage());
+            }
+        }
         
         // Сохраняем турнир
         Tournament savedTournament = tournamentRepository.save(tournament);

@@ -1,19 +1,17 @@
 package com.qdeb.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "registration_fields")
+@Table(name = "tournament_application_fields")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationField {
+public class TournamentApplicationField {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,16 +21,10 @@ public class RegistrationField {
     @Column(nullable = false)
     private String name;
     
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RegistrationFieldType type;
-    
-    @Column(nullable = false)
-    private boolean required;
+    @Column(columnDefinition = "TEXT")
+    private String value;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tournament_id", nullable = false)
-    @JsonIgnore
-    private Tournament tournament;
+    @JoinColumn(name = "application_id", nullable = false)
+    private TournamentApplication application;
 }

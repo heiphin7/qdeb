@@ -65,8 +65,19 @@ public class Tournament {
     @Column(nullable = false)
     private Integer seq;
     
+    @Column(name = "tournament_picture")
+    private String tournamentPicture;
+    
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    
+    // Метод для получения полного URL изображения
+    public String getImageURL() {
+        if (tournamentPicture == null || tournamentPicture.isEmpty()) {
+            return null;
+        }
+        return "/api/files/" + tournamentPicture;
+    }
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

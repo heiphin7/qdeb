@@ -3,10 +3,12 @@ package com.qdeb.controller;
 import com.qdeb.dto.CreateTournamentRequest;
 import com.qdeb.entity.Tournament;
 import com.qdeb.service.TournamentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,18 +19,24 @@ import java.util.List;
 public class TournamentController {
     
     private final TournamentService tournamentService;
+    private final ObjectMapper objectMapper;
     
     @PostMapping
-    public ResponseEntity<?> createTournament(@RequestBody CreateTournamentRequest request) {
+    public ResponseEntity<?> createTournament(
+            @RequestParam("tournament") String tournamentJson,
+            @RequestParam(value = "tournamentPicture", required = false) MultipartFile tournamentPicture) {
         try {
+            // Парсим JSON
+            CreateTournamentRequest request = objectMapper.readValue(tournamentJson, CreateTournamentRequest.class);
+            
             log.info("Получен запрос на создание турнира: {}", request.getName());
             log.info("Детали запроса - Slug: {}, Организатор: {}, Дата: {}, Уровень: {}", 
                     request.getSlug(), request.getOrganizerName(), request.getDate(), request.getLevel());
             log.info("Количество полей регистрации: {}", 
                     request.getRegistrationFields() != null ? request.getRegistrationFields().size() : 0);
-            // РАУНДЫ БОЛЬШЕ НЕ ПЕРЕДАЮТСЯ ПРИ СОЗДАНИИ
+            log.info("Фотография турнира: {}", tournamentPicture != null ? "загружена" : "не загружена");
             
-            Tournament tournament = tournamentService.createTournament(request);
+            Tournament tournament = tournamentService.createTournament(request, tournamentPicture);
             
             log.info("Турнир успешно создан с ID: {}", tournament.getId());
             
