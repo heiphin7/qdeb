@@ -20,5 +20,4 @@ public class CreateTournamentRequest {
     private String format;
     private Integer seq;
     private List<RegistrationFieldDto> registrationFields;
-    private List<RoundDto> rounds;
 }

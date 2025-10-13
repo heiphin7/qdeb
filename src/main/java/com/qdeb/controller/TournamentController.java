@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/tournaments")
 @RequiredArgsConstructor
@@ -24,8 +26,7 @@ public class TournamentController {
                     request.getSlug(), request.getOrganizerName(), request.getDate(), request.getLevel());
             log.info("Количество полей регистрации: {}", 
                     request.getRegistrationFields() != null ? request.getRegistrationFields().size() : 0);
-            log.info("Количество раундов: {}", 
-                    request.getRounds() != null ? request.getRounds().size() : 0);
+            // РАУНДЫ БОЛЬШЕ НЕ ПЕРЕДАЮТСЯ ПРИ СОЗДАНИИ
             
             Tournament tournament = tournamentService.createTournament(request);
             
@@ -37,6 +38,24 @@ public class TournamentController {
             log.error("Ошибка при создании турнира: {}", e.getMessage(), e);
             return ResponseEntity.badRequest()
                     .body("Ошибка при создании турнира: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping
+    public ResponseEntity<?> getAllTournaments() {
+        try {
+            log.info("Получен запрос на получение всех турниров");
+            
+            List<Tournament> tournaments = tournamentService.getAllTournaments();
+            
+            log.info("Успешно получено {} турниров", tournaments.size());
+            
+            return ResponseEntity.ok(tournaments);
+            
+        } catch (Exception e) {
+            log.error("Ошибка при получении турниров: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body("Ошибка при получении турниров: " + e.getMessage());
         }
     }
 }

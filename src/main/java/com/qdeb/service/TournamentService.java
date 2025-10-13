@@ -2,7 +2,6 @@ package com.qdeb.service;
 
 import com.qdeb.dto.CreateTournamentRequest;
 import com.qdeb.dto.RegistrationFieldDto;
-import com.qdeb.dto.RoundDto;
 import com.qdeb.entity.*;
 import com.qdeb.repository.RegistrationFieldRepository;
 import com.qdeb.repository.RoundRepository;
@@ -72,31 +71,7 @@ public class TournamentService {
             log.info("Сохранено {} полей регистрации", registrationFields.size());
         }
         
-        // Создаем раунды
-        if (request.getRounds() != null && !request.getRounds().isEmpty()) {
-            List<Round> rounds = new ArrayList<>();
-            for (RoundDto roundDto : request.getRounds()) {
-                Round round = new Round();
-                round.setName(roundDto.getName());
-                round.setAbbreviation(roundDto.getAbbreviation());
-                round.setSeq(roundDto.getSeq());
-                round.setStage(roundDto.getStage());
-                round.setDrawType(roundDto.getDrawType());
-                round.setDrawStatus(roundDto.getDrawStatus());
-                round.setBreakCategory(roundDto.getBreakCategory());
-                round.setStartsAt(roundDto.getStartsAt());
-                round.setCompleted(roundDto.isCompleted());
-                round.setFeedbackWeight(roundDto.getFeedbackWeight());
-                round.setSilent(roundDto.isSilent());
-                round.setMotionsReleased(roundDto.isMotionsReleased());
-                round.setWeight(roundDto.getWeight());
-                round.setTournament(savedTournament);
-                rounds.add(round);
-            }
-            roundRepository.saveAll(rounds);
-            savedTournament.setRounds(rounds);
-            log.info("Сохранено {} раундов", rounds.size());
-        }
+        // РАУНДЫ БОЛЬШЕ НЕ СОЗДАЕМ НА ЭТОМ ЭТАПЕ
         
         // Создаем турнир в Tabbycat
         boolean tabbycatSuccess = tabbycatTournamentService.createTournament(
@@ -113,36 +88,17 @@ public class TournamentService {
             log.info("Турнир успешно создан в Tabbycat");
         }
         
-        // Создаем раунды в Tabbycat
-        if (request.getRounds() != null && !request.getRounds().isEmpty()) {
-            for (RoundDto roundDto : request.getRounds()) {
-                Map<String, Object> roundData = new HashMap<>();
-                roundData.put("break_category", roundDto.getBreakCategory());
-                roundData.put("motions", new ArrayList<>()); // всегда пустой массив
-                roundData.put("starts_at", formatDateTime(roundDto.getStartsAt()));
-                roundData.put("seq", roundDto.getSeq());
-                roundData.put("completed", roundDto.isCompleted());
-                roundData.put("name", roundDto.getName());
-                roundData.put("abbreviation", roundDto.getAbbreviation());
-                roundData.put("stage", roundDto.getStage().name());
-                roundData.put("draw_type", roundDto.getDrawType().name());
-                roundData.put("draw_status", roundDto.getDrawStatus().name());
-                roundData.put("feedback_weight", roundDto.getFeedbackWeight());
-                roundData.put("silent", roundDto.isSilent());
-                roundData.put("motions_released", roundDto.isMotionsReleased());
-                roundData.put("weight", roundDto.getWeight());
-                
-                boolean roundSuccess = tabbycatTournamentService.createRound(request.getSlug(), roundData);
-                if (!roundSuccess) {
-                    log.warn("Не удалось создать раунд '{}' в Tabbycat", roundDto.getName());
-                } else {
-                    log.info("Раунд '{}' успешно создан в Tabbycat", roundDto.getName());
-                }
-            }
-        }
+        // РАУНДЫ В TABBYCAT БОЛЬШЕ НЕ СОЗДАЕМ НА ЭТОМ ЭТАПЕ
         
         log.info("Создание турнира '{}' завершено успешно", request.getName());
         return savedTournament;
+    }
+    
+    public List<Tournament> getAllTournaments() {
+        log.info("Получение списка всех турниров");
+        List<Tournament> tournaments = tournamentRepository.findAll();
+        log.info("Найдено {} турниров", tournaments.size());
+        return tournaments;
     }
     
     private String formatDateTime(LocalDateTime dateTime) {

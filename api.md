@@ -513,23 +513,6 @@ Host: localhost:5234
       "type": "DESCRIPTION",
       "required": true
     }
-  ],
-  "rounds": [
-    {
-      "break_category": "",
-      "starts_at": "2025-12-31T10:00:00",
-      "seq": 1,
-      "completed": false,
-      "name": "Раунд 1",
-      "abbreviation": "R1",
-      "stage": "P",
-      "draw_type": "R",
-      "draw_status": "N",
-      "feedback_weight": 0.1,
-      "silent": false,
-      "motions_released": false,
-      "weight": 1
-    }
   ]
 }
 ```
@@ -550,20 +533,6 @@ Host: localhost:5234
   - `name` — название поля
   - `type` — тип поля (DESCRIPTION, TEXT)
   - `required` — обязательное ли поле
-- `rounds` — массив раундов турнира
-  - `break_category` — категория брейка (может быть пустой)
-  - `starts_at` — время начала раунда (ISO 8601)
-  - `seq` — порядковый номер раунда
-  - `completed` — завершен ли раунд
-  - `name` — название раунда (до 40 символов)
-  - `abbreviation` — аббревиатура раунда (до 10 символов)
-  - `stage` — стадия раунда (P - Отборочные, E - Брейковый)
-  - `draw_type` — тип сетки (R - Случайный, M - Ручной, D - Раунд-Робин, P - По силе команд, E - Брейковый, S - Seeded)
-  - `draw_status` — статус сетки (N - Нет, D - Черновик, C - Подтвержденные, R - Выпущено)
-  - `feedback_weight` — вес обратной связи (0.0-1.0)
-  - `silent` — скрытый ли раунд
-  - `motions_released` — опубликованы ли темы
-  - `weight` — коэффициент очков
 
 **Ответ:**
 ```json
@@ -613,8 +582,7 @@ Host: localhost:5234
 
 **Примечания:**
 - При создании турнира автоматически создается соответствующий турнир в системе Tabbycat
-- Для каждого раунда создается соответствующий раунд в Tabbycat
-- Поле `motions` в раундах Tabbycat всегда устанавливается как пустой массив
+- Раунды на этом шаге НЕ создаются и не передаются в Tabbycat
 - Все операции логируются для отслеживания процесса создания
 
 **Логирование:**
@@ -624,6 +592,67 @@ Host: localhost:5234
 - Отправка запросов в Tabbycat API
 - Результаты создания турнира и раундов
 - Ошибки и исключения
+
+### 6.2 Получить все турниры
+**GET** `/api/tournaments`
+
+**Описание:** Получить список всех турниров
+
+**Заголовки:**
+- `Authorization: Bearer <JWT_TOKEN>`
+
+**Ответ:**
+```json
+[
+  {
+    "id": 1,
+    "name": "test1",
+    "slug": "test1",
+    "organizerName": "someOrganizer",
+    "organizerContact": "some@gmail.com",
+    "description": "best tournament in the world",
+    "date": "2025-12-31",
+    "active": true,
+    "fee": 500,
+    "level": "NATIONAL",
+    "format": "online",
+    "seq": 1,
+    "createdAt": "2025-01-10T12:00:00",
+    "updatedAt": "2025-01-10T12:00:00",
+    "registrationFields": [
+      {
+        "id": 1,
+        "name": "Full Name",
+        "type": "DESCRIPTION",
+        "required": true
+      }
+    ],
+    "rounds": [
+      {
+        "id": 1,
+        "name": "Раунд 1",
+        "abbreviation": "R1",
+        "seq": 1,
+        "stage": "P",
+        "drawType": "R",
+        "drawStatus": "N",
+        "breakCategory": null,
+        "startsAt": "2025-12-31T10:00:00",
+        "completed": false,
+        "feedbackWeight": 0.1,
+        "silent": false,
+        "motionsReleased": false,
+        "weight": 1
+      }
+    ]
+  }
+]
+```
+
+**Примечания:**
+- Возвращает массив всех турниров в системе
+- Каждый турнир включает полную информацию о полях регистрации и раундах
+- Если турниров нет, возвращается пустой массив `[]`
 
 ---
 
