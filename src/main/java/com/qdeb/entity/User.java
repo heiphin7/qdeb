@@ -3,6 +3,7 @@ package com.qdeb.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,6 +48,11 @@ public class User implements UserDetails {
     @Size(max = 100)
     @Column(name = "full_name", nullable = false)
     private String fullName;
+    
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
     
     @Size(max = 20)
     @Column(name = "phone")

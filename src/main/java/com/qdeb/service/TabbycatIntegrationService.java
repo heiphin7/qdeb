@@ -121,7 +121,7 @@ public class TabbycatIntegrationService {
         speaker.setEmail(user.getEmail());
         speaker.setPhone(user.getPhone());
         speaker.setCodeName(user.getUsername());
-        speaker.setGender("O"); // По умолчанию "Other"
+        speaker.setGender(user.getGender().name()); // Используем реальный гендер пользователя
         speaker.setPronoun(null);
         speaker.setAnonymous(true);
         speaker.setBarcode(null);
@@ -129,8 +129,8 @@ public class TabbycatIntegrationService {
         speaker.setCategories(new ArrayList<>());
         speaker.setAnswers(new ArrayList<>());
         
-        log.info("Создан спикер: name={}, lastName={}, email={}, username={}", 
-                firstName, lastName, user.getEmail(), user.getUsername());
+        log.info("Создан спикер: name={}, lastName={}, email={}, username={}, gender={}", 
+                firstName, lastName, user.getEmail(), user.getUsername(), user.getGender());
         
         return speaker;
     }

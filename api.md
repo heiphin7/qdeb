@@ -40,6 +40,7 @@ JSON для параметра `register`:
   "email": "string (email)",
   "password": "string (>=6)",
   "fullName": "string (max 100)",
+  "gender": "string (M|F|O)",
   "phone": "string (max 20, optional)",
   "description": "string (max 500, optional)"
 }
@@ -64,8 +65,9 @@ JSON для параметра `register`:
 ```
 
 Замечания:
-- Поля `username`, `email`, `password`, `fullName` обязательны.
+- Поля `username`, `email`, `password`, `fullName`, `gender` обязательны.
 - Поля `phone` и `description` опциональны.
+- Поле `gender` принимает значения: `M` (Male), `F` (Female), `O` (Other).
 - Поле `profilePicture` опционально, поддерживаются форматы: JPG, PNG, GIF, WebP (макс. 10MB).
 - Валидация осуществляется на стороне сервера.
 
@@ -856,7 +858,7 @@ POST http://localhost:8000/api/v1/tournaments/{tournament_slug}/teams
 - `email` = email пользователя
 - `phone` = телефон пользователя
 - `code_name` = username пользователя
-- `gender` = `"O"` (Other)
+- `gender` = гендер пользователя (`M`, `F`, `O`)
 - `pronoun` = `null`
 - `anonymous` = `true`
 - `categories` = `[]`
@@ -918,6 +920,7 @@ Content-Type: application/json
   "email": "test@example.com",
   "password": "password123",
   "fullName": "Иван Иванов",
+  "gender": "M",
   "phone": "+7-999-123-45-67",
   "description": "Разработчик с опытом работы в веб-технологиях"
 }

@@ -87,6 +87,7 @@ public class AuthController {
                     signUpRequest.getEmail(),
                     signUpRequest.getPassword(),
                     signUpRequest.getFullName(),
+                    signUpRequest.getGender(),
                     signUpRequest.getPhone(),
                     signUpRequest.getDescription(),
                     profilePicturePath

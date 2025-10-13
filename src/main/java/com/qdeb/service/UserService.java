@@ -1,6 +1,7 @@
 package com.qdeb.service;
 
 import com.qdeb.dto.UserProfileResponse;
+import com.qdeb.entity.Gender;
 import com.qdeb.entity.Role;
 import com.qdeb.entity.Team;
 import com.qdeb.entity.User;
@@ -26,13 +27,14 @@ public class UserService {
     private final TeamRepository teamRepository;
     
     public User createUser(String username, String email, String password, String fullName, 
-                          String phone, String description, String profilePicturePath) {
+                          Gender gender, String phone, String description, String profilePicturePath) {
         // Сначала создаем пользователя в нашей базе данных
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setFullName(fullName);
+        user.setGender(gender);
         user.setPhone(phone);
         user.setDescription(description);
         user.setProfilePicture(profilePicturePath);
