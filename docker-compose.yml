@@ -1,8 +1,17 @@
 services:
-  # PostgreSQL Database
+  qdeb-app:
+    build: .
+    ports:
+      - "4232:4232"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres
+    networks:
+      - qdeb-network
+
   postgres:
-    image: postgres:15-alpine
-    container_name: qdeb-postgres
+    image: postgres:15
     environment:
       POSTGRES_DB: qdeb
       POSTGRES_USER: postgres
@@ -13,42 +22,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - qdeb-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d qdeb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Spring Boot Application
-  qdeb-app:
-    build: .
-    container_name: qdeb-app
-    ports:
-      - "4232:4232"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/qdeb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: admin
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: false
-      JWT_SECRET: qdeb-secret-key-for-jwt-token-generation-and-validation-2024
-      JWT_EXPIRATION: 86400000
-      APP_UPLOAD_DIR: /app/uploads
-      TABBYCAT_API_URL: http://localhost:8000/api/v1
-      TABBYCAT_API_KEY: db0388ad46a02252055ecfc5e1fc8caf17e17a84
-    volumes:
-      - ./uploads:/app/uploads
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - qdeb-network
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
 
 networks:
   qdeb-network:
     driver: bridge
+
+volumes:
+  postgres_data:

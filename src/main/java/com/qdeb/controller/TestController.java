@@ -17,7 +17,7 @@ public class TestController {
     private final UserRepository userRepository;
     
     @GetMapping("/user")
-    @PreAuthorize("hasRole('ROLE_USERS')")
+    @PreAuthorize("hasRole('USERS')")
     public ResponseEntity<?> userAccess() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -29,7 +29,7 @@ public class TestController {
     }
     
     @GetMapping("/admin")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> adminAccess() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

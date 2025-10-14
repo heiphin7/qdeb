@@ -21,7 +21,7 @@ public class TournamentApplicationField {
     @Column(nullable = false)
     private String name;
     
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "\"value\"", columnDefinition = "TEXT")
     private String value;
     
     @ManyToOne(fetch = FetchType.LAZY)

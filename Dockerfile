@@ -21,7 +21,7 @@ COPY src ./src
 # Собираем приложение
 RUN ./mvnw clean package -DskipTests
 
-# Создаем директорию для загрузок
+# Создаем директории для загрузок
 RUN mkdir -p /app/uploads
 
 # Открываем порт
