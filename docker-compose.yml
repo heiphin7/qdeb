@@ -9,6 +9,19 @@ services:
       - postgres
     networks:
       - qdeb-network
+    command: >
+      sh -c "
+        echo 'Запуск приложения с автоматическими тестами...' &&
+        echo 'Выполняем тесты аутентификации...' &&
+        ./mvnw test -Dtest=AuthenticationUnitTest &&
+        echo 'Выполняем тесты валидации...' &&
+        ./mvnw test -Dtest=AuthenticationValidationTest &&
+        echo 'Выполняем тесты JWT токенов...' &&
+        ./mvnw test -Dtest=JwtTokenTest &&
+        echo 'Все тесты завершены успешно!' &&
+        echo 'Запускаем основное приложение...' &&
+        java -jar target/qdeb-0.0.1-SNAPSHOT.jar
+      "
 
   postgres:
     image: postgres:15

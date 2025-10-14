@@ -51,6 +51,40 @@ public class AuthController {
      * - part "register" -> JSON RegisterRequest
      * - part "profilePicture" -> файл (optional)
      */
+    @PostMapping(value = "/signup", consumes = "application/json")
+    public ResponseEntity<?> registerUserJson(@Valid @RequestBody SignUpRequest signUpRequest) {
+        try {
+            // Валидация
+            if (userService.existsByUsername(signUpRequest.getUsername())) {
+                return ResponseEntity.badRequest()
+                        .body("Ошибка: Имя пользователя уже используется!");
+            }
+            
+            if (userService.existsByEmail(signUpRequest.getEmail())) {
+                return ResponseEntity.badRequest()
+                        .body("Ошибка: Email уже используется!");
+            }
+            
+            // Создание пользователя
+            User user = userService.createUser(
+                    signUpRequest.getUsername(),
+                    signUpRequest.getEmail(),
+                    signUpRequest.getPassword(),
+                    signUpRequest.getFullName(),
+                    signUpRequest.getGender(),
+                    signUpRequest.getPhone(),
+                    signUpRequest.getDescription(),
+                    null
+            );
+            
+            return ResponseEntity.ok("Пользователь успешно зарегистрирован!");
+            
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body("Ошибка при регистрации: " + e.getMessage());
+        }
+    }
+    
     @PostMapping(value = "/signup", consumes = "multipart/form-data")
     public ResponseEntity<?> registerUser(
             @RequestPart("register") String registerJson,

@@ -18,7 +18,7 @@ RUN ./mvnw dependency:go-offline -B
 # Копируем исходный код
 COPY src ./src
 
-# Собираем приложение
+# Собираем приложение (без тестов, они будут запущены в runtime)
 RUN ./mvnw clean package -DskipTests
 
 # Создаем директории для загрузок
@@ -27,5 +27,5 @@ RUN mkdir -p /app/uploads
 # Открываем порт
 EXPOSE 4232
 
-# Запускаем приложение
+# Запускаем приложение (команда будет переопределена в docker-compose)
 CMD ["java", "-jar", "target/qdeb-0.0.1-SNAPSHOT.jar"]
