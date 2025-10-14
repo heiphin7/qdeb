@@ -73,27 +73,41 @@ public class TournamentApplicationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Команда должна иметь ровно 2 участника");
         }
         
-        // 8. Проверяем, что команда еще не подавала заявку на этот турнир
+        // 8. Проверяем, что у пользователя нет активных заявок на этот конкретный турнир (PENDING или APPROVED)
+        List<ApplicationStatus> activeStatuses = List.of(ApplicationStatus.PENDING, ApplicationStatus.APPROVED);
+        List<TournamentApplication> activeApplicationsOnThisTournament = applicationRepository
+                .findBySubmittedByIdAndStatusIn(user.getId(), activeStatuses)
+                .stream()
+                .filter(app -> app.getTournament().getId().equals(tournamentId))
+                .toList();
+        
+        if (!activeApplicationsOnThisTournament.isEmpty()) {
+            log.warn("Пользователь {} уже имеет активную заявку на турнир {}", username, tournamentId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                "У вас уже есть активная заявка на этот турнир. Вы не можете подавать повторные заявки, пока не будет рассмотрена текущая.");
+        }
+        
+        // 9. Проверяем, что команда еще не подавала заявку на этот турнир
         if (applicationRepository.findByTournamentIdAndTeamId(tournamentId, request.getTeamId()).isPresent()) {
             log.warn("Команда {} уже подавала заявку на турнир {}", request.getTeamId(), tournamentId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Команда уже подавала заявку на этот турнир");
         }
         
-        // 9. Валидируем поля регистрации
+        // 10. Валидируем поля регистрации
         validateRegistrationFields(tournament, request.getFields());
         
-        // 10. Создаем заявку
+        // 11. Создаем заявку
         TournamentApplication application = new TournamentApplication();
         application.setTournament(tournament);
         application.setTeam(team);
         application.setSubmittedBy(user);
         application.setStatus(ApplicationStatus.PENDING);
         
-        // 11. Сохраняем заявку
+        // 12. Сохраняем заявку
         TournamentApplication savedApplication = applicationRepository.save(application);
         log.info("Заявка сохранена с ID: {}", savedApplication.getId());
         
-        // 12. Создаем поля заявки
+        // 13. Создаем поля заявки
         List<TournamentApplicationField> applicationFields = new ArrayList<>();
         for (ApplicationFieldDto fieldDto : request.getFields()) {
             TournamentApplicationField field = new TournamentApplicationField();

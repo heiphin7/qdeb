@@ -22,4 +22,6 @@ public interface TournamentApplicationRepository extends JpaRepository<Tournamen
     Optional<TournamentApplication> findByTournamentIdAndTeamId(Long tournamentId, Long teamId);
     
     List<TournamentApplication> findBySubmittedById(Long submittedById);
+    
+    List<TournamentApplication> findBySubmittedByIdAndStatusIn(Long submittedById, List<ApplicationStatus> statuses);
 }
