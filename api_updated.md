@@ -7,7 +7,9 @@ Authentication: Bearer Token (JWT)
 !!! Важные моменты по проекту:
 1. Пожалуйста, чтобы все функции работали корректно запусти Tabbycat Docker, если не знаешь как то напиши мне
 2. Все функции были простетировано по отдельности, поэтому если возникнут ошибки то это скорее всего ошибка окружения либо вы запустили что то неправильно либо неправильно кидаете запрос, также если ошибки будут пишите мне
-3. 
+3. При первом запуске приложения автоматически создается админский аккаунт: username=admin, password=admin с ролью ROLE_ADMIN
+
+если чето не так свяжись со мной @heiPHin7 (тг)
 
 КРАТКИЙ ПЕРЕЧЕНЬ ENDPOINTS
 
@@ -23,6 +25,7 @@ GET /api/profile/{username} - Получение публичного профи
 POST /api/teams - Создание новой команды
 POST /api/teams/join - Вступление в команду по коду
 POST /api/teams/leave - Выход из команды
+POST /api/teams/kick/{userId} - Исключение участника из команды (только лидер)
 GET /api/teams/my - Получение информации о своей команде
 GET /api/teams/{teamId}/applications - Получение заявок команды
 
@@ -53,6 +56,15 @@ GET /api/test/profile - Получение профиля для тестиро�
 Authorization: Bearer <jwt_token>
 
 JWT токены действительны 24 часа. Получите токен через endpoint signin.
+
+Админский аккаунт:
+При первом запуске приложения автоматически создается админский аккаунт:
+- Username: admin
+- Password: admin
+- Email: admin@qdeb.com
+- Роль: ROLE_ADMIN
+
+Используйте эти данные для входа в систему с правами администратора.
 
 ОТВЕТЫ С ОШИБКАМИ
 
@@ -257,7 +269,38 @@ Get current user's team information.
 
 Успешный ответ: Same as Create Team
 
-9. Get Team Applications
+9. Kick Member from Team
+POST /api/teams/kick/{userId}
+
+Kick a member from the team (only for team leader).
+
+Заголовки: Authorization: Bearer <token>
+
+URL Parameters:
+- userId - ID of the user to kick
+
+Успешный ответ: Team data after kicking member
+
+Ответы с ошибками:
+400 Bad Request
+"Пользователь не состоит в команде"
+
+400 Bad Request
+"Только лидер команды может исключать участников"
+
+400 Bad Request
+"Пользователь не найден"
+
+400 Bad Request
+"Пользователь не состоит в команде"
+
+400 Bad Request
+"Пользователь не состоит в вашей команде"
+
+400 Bad Request
+"Лидер не может исключить самого себя"
+
+10. Get Team Applications
 GET /api/teams/{teamId}/applications
 
 Get all applications submitted by a team.
@@ -336,7 +379,7 @@ Query Parameters:
 
 ТУРНИРЫ
 
-10. Create Tournament
+11. Create Tournament
 POST /api/tournaments
 
 Create a new tournament with registration fields.
@@ -409,7 +452,7 @@ Tournament JSON:
 400 Bad Request
 "Турнир с таким slug уже существует: national-2024"
 
-11. Get All Tournaments
+12. Get All Tournaments
 GET /api/tournaments
 
 Get list of all tournaments.
@@ -447,7 +490,7 @@ Get list of all tournaments.
   }
 ]
 
-12. Submit Tournament Application
+13. Submit Tournament Application
 POST /api/tournaments/{tournamentId}/apply
 
 Submit team application for tournament participation.
@@ -497,7 +540,7 @@ Submit team application for tournament participation.
 404 Not Found
 "Турнир не найден"
 
-13. Get Tournament Applications
+14. Get Tournament Applications
 GET /api/tournaments/{tournamentSlug}/applications
 
 Get all applications for a tournament.
@@ -511,7 +554,7 @@ Query Parameters:
 
 УПРАВЛЕНИЕ ЗАЯВКАМИ
 
-14. Accept Application
+15. Accept Application
 POST /api/applications/{applicationId}/accept
 
 Accept a tournament application (Admin only).
@@ -530,7 +573,7 @@ Accept a tournament application (Admin only).
 404 Not Found
 "Заявка не найдена"
 
-15. Reject Application
+16. Reject Application
 POST /api/applications/{applicationId}/reject
 
 Reject a tournament application (Admin only).
@@ -543,7 +586,7 @@ Reject a tournament application (Admin only).
 
 УПРАВЛЕНИЕ ФАЙЛАМИ
 
-16. Get File
+17. Get File
 GET /api/files/{fileName}
 
 Get any file from uploads directory.
@@ -553,7 +596,7 @@ Get any file from uploads directory.
 Ответ с ошибкой:
 404 Not Found
 
-17. Get Profile Picture
+18. Get Profile Picture
 GET /api/files/profile-picture/{fileName}
 
 Get profile picture by filename.
@@ -562,7 +605,7 @@ Get profile picture by filename.
 
 ТЕСТОВЫЕ ENDPOINTS
 
-18. Public Test
+19. Public Test
 GET /api/test/public
 
 Public endpoint for testing.
@@ -571,7 +614,7 @@ Public endpoint for testing.
 200 OK
 "Это публичный endpoint, доступен всем."
 
-19. User Test
+20. User Test
 GET /api/test/user
 
 Protected endpoint for authenticated users.
@@ -582,7 +625,7 @@ Protected endpoint for authenticated users.
 200 OK
 "Привет, alice! Это защищенный endpoint для пользователей."
 
-20. Admin Test
+21. Admin Test
 GET /api/test/admin
 
 Protected endpoint for administrators.
@@ -593,7 +636,7 @@ Protected endpoint for administrators.
 200 OK
 "Привет, admin! Это защищенный endpoint для администраторов."
 
-21. Profile Test
+22. Profile Test
 GET /api/test/profile
 
 Get current user profile for testing.

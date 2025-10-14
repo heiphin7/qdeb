@@ -127,6 +127,22 @@ public class TeamController {
         }
     }
     
+    @PostMapping("/kick/{userId}")
+    public ResponseEntity<?> kickMember(@PathVariable Long userId) {
+        try {
+            User currentUser = getCurrentUser();
+            TeamResponse team = teamService.kickMember(currentUser, userId);
+            
+            if (team == null) {
+                return ResponseEntity.ok("Команда удалена (не осталось участников)");
+            } else {
+                return ResponseEntity.ok(team);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ошибка при исключении участника: " + e.getMessage());
+        }
+    }
+    
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();

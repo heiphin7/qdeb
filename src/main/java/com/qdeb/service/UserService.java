@@ -70,6 +70,10 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
     
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+    
     public User updateProfilePicture(Long userId, String profilePicturePath) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));

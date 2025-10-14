@@ -139,6 +139,54 @@ public class TeamService {
         return code.toString();
     }
     
+    @Transactional
+    public TeamResponse kickMember(User currentUser, Long userIdToKick) {
+        // Проверяем, что текущий пользователь состоит в команде
+        TeamMember currentUserMember = teamMemberRepository.findByUser(currentUser)
+                .orElseThrow(() -> new RuntimeException("Пользователь не состоит в команде"));
+        
+        Team team = currentUserMember.getTeam();
+        
+        // Проверяем, что текущий пользователь является лидером команды
+        if (!team.getLeader().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Только лидер команды может исключать участников");
+        }
+        
+        // Проверяем, что пользователь, которого кикают, существует
+        User userToKick = userRepository.findById(userIdToKick)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        
+        // Проверяем, что пользователь, которого кикают, состоит в команде
+        TeamMember memberToKick = teamMemberRepository.findByUser(userToKick)
+                .orElseThrow(() -> new RuntimeException("Пользователь не состоит в команде"));
+        
+        // Проверяем, что пользователь, которого кикают, состоит в той же команде
+        if (!memberToKick.getTeam().getId().equals(team.getId())) {
+            throw new RuntimeException("Пользователь не состоит в вашей команде");
+        }
+        
+        // Проверяем, что лидер не пытается кикнуть самого себя
+        if (userToKick.getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Лидер не может исключить самого себя");
+        }
+        
+        // Удаляем пользователя из команды
+        teamMemberRepository.delete(memberToKick);
+        
+        log.info("Пользователь {} исключен из команды {} лидером {}", 
+                userToKick.getUsername(), team.getName(), currentUser.getUsername());
+        
+        // Если в команде остался только лидер, удаляем команду
+        List<TeamMember> remainingMembers = teamMemberRepository.findByTeam(team);
+        if (remainingMembers.isEmpty()) {
+            teamRepository.delete(team);
+            log.info("Команда {} удалена (не осталось участников)", team.getName());
+            return null;
+        }
+        
+        return convertToTeamResponse(team);
+    }
+    
     private TeamResponse convertToTeamResponse(Team team) {
         return new TeamResponse(
                 team.getId(),
