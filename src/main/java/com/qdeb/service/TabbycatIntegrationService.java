@@ -83,15 +83,15 @@ public class TabbycatIntegrationService {
         request.setCodeName(teamName);
         request.setUseInstitutionPrefix(false);
         request.setSeed(null);
-        request.setEmoji(null);
+        request.setEmoji("");
         
-        // Поля, которые оставляем null
-        request.setInstitution(null);
-        request.setBreakCategories(null);
-        request.setInstitutionConflicts(null);
-        request.setVenueConstraints(null);
-        request.setAnswers(null);
-        
+        // Поля, которые не могут быть null - устанавливаем пустые значения
+        request.setInstitution("");
+        request.setBreakCategories(new ArrayList<>());
+        request.setInstitutionConflicts(new ArrayList<>());
+        request.setVenueConstraints(new ArrayList<>());
+        request.setAnswers(new ArrayList<>());
+
         // Создаем спикеров из команды
         List<TabbycatTeamRequest.Speaker> speakers = new ArrayList<>();
         
@@ -142,13 +142,13 @@ public class TabbycatIntegrationService {
         speaker.setName(firstName);
         speaker.setLastName(lastName);
         speaker.setEmail(user.getEmail());
-        speaker.setPhone(user.getPhone());
+        speaker.setPhone(user.getPhone() != null ? user.getPhone() : "");
         speaker.setCodeName(user.getUsername());
         speaker.setGender(userGender); // Используем реальный гендер пользователя
-        speaker.setPronoun(null);
+        speaker.setPronoun("");
         speaker.setAnonymous(true);
         speaker.setBarcode(null);
-        speaker.setUrlKey(null);
+        speaker.setUrlKey("");
         speaker.setCategories(new ArrayList<>());
         speaker.setAnswers(new ArrayList<>());
         
