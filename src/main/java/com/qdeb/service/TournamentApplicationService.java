@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,10 +88,31 @@ public class TournamentApplicationService {
                 "У вас уже есть активная заявка на этот турнир. Вы не можете подавать повторные заявки, пока не будет рассмотрена текущая.");
         }
         
-        // 9. Проверяем, что команда еще не подавала заявку на этот турнир
-        if (applicationRepository.findByTournamentIdAndTeamId(tournamentId, request.getTeamId()).isPresent()) {
-            log.warn("Команда {} уже подавала заявку на турнир {}", request.getTeamId(), tournamentId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Команда уже подавала заявку на этот турнир");
+        // 8.1. Дополнительная проверка: если у пользователя есть только REJECTED заявки на этот турнир, разрешаем подавать новую
+        List<TournamentApplication> allApplicationsOnThisTournament = applicationRepository
+                .findBySubmittedById(user.getId())
+                .stream()
+                .filter(app -> app.getTournament().getId().equals(tournamentId))
+                .toList();
+        
+        boolean hasOnlyRejectedApplications = !allApplicationsOnThisTournament.isEmpty() && 
+                allApplicationsOnThisTournament.stream()
+                        .allMatch(app -> app.getStatus() == ApplicationStatus.REJECTED);
+        
+        if (hasOnlyRejectedApplications) {
+            log.info("У пользователя {} есть только отклоненные заявки на турнир {}, разрешаем подать новую", username, tournamentId);
+        }
+        
+        // 9. Проверяем, что команда еще не подавала активную заявку на этот турнир
+        Optional<TournamentApplication> existingTeamApplication = applicationRepository.findByTournamentIdAndTeamId(tournamentId, request.getTeamId());
+        if (existingTeamApplication.isPresent()) {
+            TournamentApplication existingApp = existingTeamApplication.get();
+            if (existingApp.getStatus() == ApplicationStatus.PENDING || existingApp.getStatus() == ApplicationStatus.APPROVED) {
+                log.warn("Команда {} уже имеет активную заявку на турнир {}", request.getTeamId(), tournamentId);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Команда уже имеет активную заявку на этот турнир");
+            } else if (existingApp.getStatus() == ApplicationStatus.REJECTED) {
+                log.info("У команды {} есть отклоненная заявка на турнир {}, разрешаем подать новую", request.getTeamId(), tournamentId);
+            }
         }
         
         // 10. Валидируем поля регистрации

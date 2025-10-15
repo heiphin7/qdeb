@@ -30,7 +30,9 @@ public class TabbycatTournamentService {
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            // Пробуем разные форматы авторизации
             headers.set("Authorization", "Token " + tabbycatApiKey);
+            // Альтернативно: headers.set("Authorization", "Bearer " + tabbycatApiKey);
             
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("name", name);
@@ -42,7 +44,9 @@ public class TabbycatTournamentService {
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
             
             log.info("Отправка запроса на создание турнира в Tabbycat: {}", url);
+            log.info("API ключ: {}", tabbycatApiKey);
             log.info("Данные запроса: {}", requestBody);
+            log.info("Заголовки: {}", headers);
             
             ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
             
@@ -57,6 +61,9 @@ public class TabbycatTournamentService {
             
         } catch (Exception e) {
             log.error("Исключение при создании турнира в Tabbycat: {}", e.getMessage(), e);
+            if (e.getMessage().contains("401")) {
+                log.error("Ошибка авторизации - проверьте API ключ: {}", tabbycatApiKey);
+            }
             return false;
         }
     }
