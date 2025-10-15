@@ -51,7 +51,19 @@ public class TeamController {
     public ResponseEntity<?> leaveTeam() {
         try {
             User currentUser = getCurrentUser();
+            log.info("Пользователь {} запрашивает выход из команды", currentUser.getUsername());
+            
             TeamResponse team = teamService.leaveTeam(currentUser);
+            
+            // Дополнительная проверка - убеждаемся, что пользователь действительно покинул команду
+            boolean stillInTeam = teamService.isUserInTeam(currentUser);
+            if (stillInTeam) {
+                log.error("ОШИБКА: Пользователь {} все еще состоит в команде после выхода!", currentUser.getUsername());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Ошибка: пользователь не смог покинуть команду");
+            }
+            
+            log.info("Пользователь {} успешно покинул команду", currentUser.getUsername());
             
             if (team == null) {
                 return ResponseEntity.ok("Команда удалена (не осталось участников)");
@@ -59,6 +71,7 @@ public class TeamController {
                 return ResponseEntity.ok(team);
             }
         } catch (Exception e) {
+            log.error("Ошибка при выходе из команды для пользователя {}: {}", getCurrentUser().getUsername(), e.getMessage());
             return ResponseEntity.badRequest().body("Ошибка при выходе из команды: " + e.getMessage());
         }
     }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,7 @@ public class TournamentController {
     private final ObjectMapper objectMapper;
     
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createTournament(
             @RequestParam("tournament") String tournamentJson,
             @RequestParam(value = "tournamentPicture", required = false) MultipartFile tournamentPicture) {
@@ -29,7 +31,7 @@ public class TournamentController {
             // Парсим JSON
             CreateTournamentRequest request = objectMapper.readValue(tournamentJson, CreateTournamentRequest.class);
             
-            log.info("Получен запрос на создание турнира: {}", request.getName());
+            log.info("Получен запрос на создание турнира: {} (только для ADMIN)", request.getName());
             log.info("Детали запроса - Slug: {}, Организатор: {}, Дата: {}, Уровень: {}", 
                     request.getSlug(), request.getOrganizerName(), request.getDate(), request.getLevel());
             log.info("Количество полей регистрации: {}", 

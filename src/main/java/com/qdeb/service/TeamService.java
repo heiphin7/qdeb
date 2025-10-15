@@ -83,19 +83,29 @@ public class TeamService {
     
     @Transactional
     public TeamResponse leaveTeam(User currentUser) {
+        log.info("Пользователь {} пытается покинуть команду", currentUser.getUsername());
+        
         // Находим команду пользователя
         TeamMember member = teamMemberRepository.findByUser(currentUser)
                 .orElseThrow(() -> new RuntimeException("Пользователь не состоит в команде"));
         
         Team team = member.getTeam();
+        log.info("Пользователь {} состоит в команде: {} (ID: {})", currentUser.getUsername(), team.getName(), team.getId());
+        
+        // Проверяем, был ли пользователь лидером
+        boolean wasLeader = team.getLeader().getId().equals(currentUser.getId());
+        log.info("Пользователь {} был лидером: {}", currentUser.getUsername(), wasLeader);
         
         // Удаляем пользователя из команды
         teamMemberRepository.delete(member);
+        log.info("Пользователь {} удален из таблицы TeamMember", currentUser.getUsername());
         
         // Если пользователь был лидером
-        if (team.getLeader().getId().equals(currentUser.getId())) {
+        if (wasLeader) {
             // Если в команде есть другие участники, делаем первого лидером
             List<TeamMember> remainingMembers = teamMemberRepository.findByTeam(team);
+            log.info("Осталось участников в команде: {}", remainingMembers.size());
+            
             if (!remainingMembers.isEmpty()) {
                 User newLeader = remainingMembers.get(0).getUser();
                 team.setLeader(newLeader);
@@ -109,7 +119,11 @@ public class TeamService {
             }
         }
         
-        log.info("Пользователь {} покинул команду: {}", currentUser.getUsername(), team.getName());
+        log.info("Пользователь {} успешно покинул команду: {}", currentUser.getUsername(), team.getName());
+        
+        // Проверяем, что пользователь действительно больше не состоит в команде
+        boolean stillInTeam = teamMemberRepository.existsByUser(currentUser);
+        log.info("Пользователь {} все еще состоит в команде: {}", currentUser.getUsername(), stillInTeam);
         
         return convertToTeamResponse(team);
     }
@@ -119,6 +133,10 @@ public class TeamService {
                 .orElseThrow(() -> new RuntimeException("Пользователь не состоит в команде"));
         
         return convertToTeamResponse(team);
+    }
+    
+    public boolean isUserInTeam(User user) {
+        return teamMemberRepository.existsByUser(user);
     }
     
     private String generateUniqueJoinCode() {
