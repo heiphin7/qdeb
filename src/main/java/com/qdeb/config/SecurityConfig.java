@@ -70,12 +70,17 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                // Разрешаем preflight-запросы
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
+                // Разрешаем публичные ручки
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/test/public").permitAll()
                 .requestMatchers("/api/files/**").permitAll()
                 .requestMatchers("/api/profile/{username}").permitAll()
                 .requestMatchers("/api/users/{username}").permitAll()
-                .requestMatchers("/api/test/**").authenticated()
+
+                // Остальное — по JWT
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -83,7 +88,8 @@ public class SecurityConfig {
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
+
 }
