@@ -33,6 +33,7 @@ GET /api/teams/{teamId}/applications - Получение заявок кома�
 Турниры:
 POST /api/tournaments - Создание турнира
 GET /api/tournaments - Получение списка всех турниров
+GET /api/tournaments/{slug} - Получение турнира по slug
 POST /api/tournaments/{tournamentId}/apply - Подача заявки на турнир
 GET /api/tournaments/{tournamentSlug}/applications - Получение заявок на турнир
 
@@ -491,7 +492,47 @@ Get list of all tournaments.
   }
 ]
 
-13. Submit Tournament Application
+13. Get Tournament by Slug
+GET /api/tournaments/{slug}
+
+Get tournament by its slug.
+
+URL Parameters:
+- slug - Tournament slug (e.g., "national-2024")
+
+Успешный ответ:
+{
+  "id": 1,
+  "name": "National Championship 2024",
+  "slug": "national-2024",
+  "organizerName": "Debate Society",
+  "organizerContact": "contact@debatesociety.com",
+  "description": "Annual national debate championship",
+  "date": "2024-12-31",
+  "active": true,
+  "fee": 500,
+  "level": "NATIONAL",
+  "format": "online",
+  "seq": 1,
+  "tournamentPicture": "uuid-filename.jpg",
+  "imageURL": "/api/files/uuid-filename.jpg",
+  "createdAt": "2024-01-01T12:00:00",
+  "updatedAt": "2024-01-01T12:00:00",
+  "registrationFields": [
+    {
+      "id": 1,
+      "name": "Full Name",
+      "type": "DESCRIPTION",
+      "required": true
+    }
+  ],
+  "rounds": []
+}
+
+Ответ с ошибкой:
+404 Not Found
+
+14. Submit Tournament Application
 POST /api/tournaments/{tournamentId}/apply
 
 Submit team application for tournament participation.
@@ -541,7 +582,7 @@ Submit team application for tournament participation.
 404 Not Found
 "Турнир не найден"
 
-14. Get Tournament Applications
+15. Get Tournament Applications
 GET /api/tournaments/{tournamentSlug}/applications
 
 Get all applications for a tournament.
@@ -555,7 +596,7 @@ Query Parameters:
 
 УПРАВЛЕНИЕ ЗАЯВКАМИ
 
-15. Accept Application
+16. Accept Application
 POST /api/applications/{applicationId}/accept
 
 Accept a tournament application (Admin only).
@@ -574,7 +615,7 @@ Accept a tournament application (Admin only).
 404 Not Found
 "Заявка не найдена"
 
-16. Reject Application
+17. Reject Application
 POST /api/applications/{applicationId}/reject
 
 Reject a tournament application (Admin only).
@@ -587,7 +628,7 @@ Reject a tournament application (Admin only).
 
 УПРАВЛЕНИЕ ФАЙЛАМИ
 
-17. Get File
+18. Get File
 GET /api/files/{fileName}
 
 Get any file from uploads directory.
@@ -597,7 +638,7 @@ Get any file from uploads directory.
 Ответ с ошибкой:
 404 Not Found
 
-18. Get Profile Picture
+19. Get Profile Picture
 GET /api/files/profile-picture/{fileName}
 
 Get profile picture by filename.
@@ -606,7 +647,7 @@ Get profile picture by filename.
 
 ТЕСТОВЫЕ ENDPOINTS
 
-19. Public Test
+20. Public Test
 GET /api/test/public
 
 Public endpoint for testing.
@@ -615,7 +656,7 @@ Public endpoint for testing.
 200 OK
 "Это публичный endpoint, доступен всем."
 
-20. User Test
+21. User Test
 GET /api/test/user
 
 Protected endpoint for authenticated users.
@@ -626,7 +667,7 @@ Protected endpoint for authenticated users.
 200 OK
 "Привет, alice! Это защищенный endpoint для пользователей."
 
-21. Admin Test
+22. Admin Test
 GET /api/test/admin
 
 Protected endpoint for administrators.
@@ -637,7 +678,7 @@ Protected endpoint for administrators.
 200 OK
 "Привет, admin! Это защищенный endpoint для администраторов."
 
-22. Profile Test
+23. Profile Test
 GET /api/test/profile
 
 Get current user profile for testing.
