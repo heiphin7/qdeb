@@ -68,4 +68,25 @@ public class TournamentController {
                     .body("Ошибка при получении турниров: " + e.getMessage());
         }
     }
+    
+    @GetMapping("/{slug}")
+    public ResponseEntity<?> getTournamentBySlug(@PathVariable String slug) {
+        try {
+            log.info("Получен запрос на получение турнира по slug: {}", slug);
+            
+            Tournament tournament = tournamentService.getTournamentBySlug(slug);
+            
+            log.info("Турнир найден: {} (ID: {})", tournament.getName(), tournament.getId());
+            
+            return ResponseEntity.ok(tournament);
+            
+        } catch (RuntimeException e) {
+            log.warn("Турнир с slug '{}' не найден: {}", slug, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Ошибка при получении турнира по slug '{}': {}", slug, e.getMessage(), e);
+            return ResponseEntity.badRequest()
+                    .body("Ошибка при получении турнира: " + e.getMessage());
+        }
+    }
 }

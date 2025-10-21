@@ -115,6 +115,12 @@ public class TournamentService {
         return tournaments;
     }
     
+    public Tournament getTournamentBySlug(String slug) {
+        log.info("Поиск турнира по slug: {}", slug);
+        return tournamentRepository.findBySlug(slug)
+                .orElseThrow(() -> new RuntimeException("Турнир с slug '" + slug + "' не найден"));
+    }
+    
     private String formatDateTime(LocalDateTime dateTime) {
         if (dateTime == null) {
             return null;
