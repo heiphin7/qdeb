@@ -31,6 +31,11 @@ public class TeamService {
         if (teamMemberRepository.existsByUser(currentUser)) {
             throw new RuntimeException("Пользователь уже состоит в команде");
         }
+
+        String newTeamName = request.getName();
+        if (teamRepository.existsByNameIgnoreCase(newTeamName)) {
+            throw new RuntimeException("Команда с таким названием уже существует (регистронезависимо)");
+        }
         
         // Генерируем уникальный joinCode
         String joinCode = generateUniqueJoinCode();

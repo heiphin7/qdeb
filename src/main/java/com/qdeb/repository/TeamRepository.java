@@ -18,4 +18,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     
     @Query("SELECT t FROM Team t WHERE t.leader.id = :userId")
     Optional<Team> findByLeaderId(@Param("userId") Long userId);
+
+    // Метод для регистронезависимой проверки существования команды по имени
+    boolean existsByNameIgnoreCase(String name);
 }
