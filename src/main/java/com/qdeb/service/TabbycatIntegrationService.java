@@ -140,7 +140,7 @@ public class TabbycatIntegrationService {
         String userGender = user.getGender() != null ? user.getGender().name() : "O";
         
         speaker.setName(firstName);
-        speaker.setLastName(lastName);
+        speaker.setLastName(user.getFullName);
         speaker.setEmail(user.getEmail());
         speaker.setPhone(user.getPhone() != null ? user.getPhone() : "");
         speaker.setCodeName(user.getUsername());
