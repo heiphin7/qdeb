@@ -1,0 +1,31 @@
+services:
+  qdeb-app:
+    build: .
+    ports:
+      - "4232:4232"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres
+    networks:
+      - qdeb-network
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: qdeb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - qdeb-network
+
+networks:
+  qdeb-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
