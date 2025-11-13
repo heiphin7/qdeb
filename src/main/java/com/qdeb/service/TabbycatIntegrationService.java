@@ -139,8 +139,8 @@ public class TabbycatIntegrationService {
         // Получаем гендер пользователя
         String userGender = user.getGender() != null ? user.getGender().name() : "O";
         
-        speaker.setName(firstName);
-        speaker.setLastName(user.getFullName);
+        speaker.setName(user.getFullName());
+        speaker.setLastName(user.getFullName());
         speaker.setEmail(user.getEmail());
         speaker.setPhone(user.getPhone() != null ? user.getPhone() : "");
         speaker.setCodeName(user.getUsername());
