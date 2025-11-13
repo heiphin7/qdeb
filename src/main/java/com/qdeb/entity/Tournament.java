@@ -44,7 +44,11 @@ public class Tournament {
     
     @NotNull
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDate startDate;
+
+    @NotNull
+    @Column(nullable = false)
+    private LocalDate endDate;
     
     @Column(nullable = false)
     private boolean active;

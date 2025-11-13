@@ -25,7 +25,6 @@ import java.util.Map;
 public class TournamentService {
     
     private final TournamentRepository tournamentRepository;
-    private final RoundRepository roundRepository;
     private final RegistrationFieldRepository registrationFieldRepository;
     private final TabbycatTournamentService tabbycatTournamentService;
     private final FileStorageService fileStorageService;
@@ -38,6 +37,10 @@ public class TournamentService {
         if (tournamentRepository.existsBySlug(request.getSlug())) {
             throw new RuntimeException("Турнир с таким slug уже существует: " + request.getSlug());
         }
+
+        if (request.getEndDate().isBefore(request.getStartDate())) {
+            throw new IllegalArgumentException("Дата окончания не может быть раньше даты начала");
+        }
         
         // Создаем турнир в нашей базе данных
         Tournament tournament = new Tournament();
@@ -46,7 +49,8 @@ public class TournamentService {
         tournament.setOrganizerName(request.getOrganizerName());
         tournament.setOrganizerContact(request.getOrganizerContact());
         tournament.setDescription(request.getDescription());
-        tournament.setDate(request.getDate());
+        tournament.setStartDate(request.getStartDate());
+        tournament.setEndDate(request.getEndDate());
         tournament.setActive(request.isActive());
         tournament.setFee(request.getFee());
         tournament.setLevel(request.getLevel());

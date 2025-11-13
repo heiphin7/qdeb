@@ -93,10 +93,21 @@ public class UserService {
     
     public UserProfileResponse getUserProfile(Long userId) {
         User user = getUserById(userId);
-        
-        // Находим команду пользователя (как лидера или как участника)
+
+        if (user.getProfilePicture() != null && user.getProfilePicture().startsWith("/api/files/")) {
+            try {
+                String oldPath = user.getProfilePicture();
+                String uuid = oldPath.substring(oldPath.lastIndexOf("/") + 1);
+                uuid = uuid.replaceAll("\\.[^.]+$", "");
+                String newPath = "/api/files/profile-picture/" + uuid + ".png";
+                user.setProfilePicture(newPath);
+            } catch (Exception e) {
+                // на случай если вдруг что-то не так с форматом
+                System.err.println("Ошибка при фиксе profilePicture для userId=" + userId + ": " + e.getMessage());
+            }
+        }
+
         Optional<Team> team = findUserTeam(userId);
-        
         return new UserProfileResponse(user, team.orElse(null));
     }
     

@@ -13,7 +13,8 @@ public class CreateTournamentRequest {
     private String organizerName;
     private String organizerContact;
     private String description;
-    private LocalDate date;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private boolean active;
     private Integer fee;
     private TournamentLevel level;
