@@ -5,6 +5,8 @@ services:
       - "4232:4232"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
       - postgres
     networks:
@@ -29,3 +31,4 @@ networks:
 
 volumes:
   postgres_data:
+  uploads_data:
