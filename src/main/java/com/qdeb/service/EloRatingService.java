@@ -23,21 +23,22 @@ public class EloRatingService {
     public List<SpeakerRatingDto> calculateSpeakerRatings() {
         String sql = """
                 SELECT
-                    ps.id          AS speaker_id,
-                    ps.name        AS speaker_name,
-                    pt.short_name  AS team_name,
-                    SUM(ss.score)  AS total_score,
-                    db.id          AS debate_id
+                    ps.person_ptr_id  AS speaker_id,
+                    pp.name           AS speaker_name,
+                    pt.short_name     AS team_name,
+                    SUM(ss.score)     AS total_score,
+                    db.id             AS debate_id
                 FROM results_speakerscore ss
                 JOIN results_ballotsubmission bs ON ss.ballot_submission_id = bs.id
                 JOIN draw_debateteam dt          ON ss.debate_team_id = dt.id
                 JOIN draw_debate db              ON dt.debate_id = db.id
                 JOIN tournaments_round r         ON db.round_id = r.id
-                JOIN participants_speaker ps     ON ss.speaker_id = ps.id
+                JOIN participants_speaker ps     ON ss.speaker_id = ps.person_ptr_id
+                JOIN participants_person pp      ON ps.person_ptr_id = pp.id
                 JOIN participants_team pt        ON ps.team_id = pt.id
                 WHERE bs.confirmed = true
                   AND NOT COALESCE(ss.ghost, false)
-                GROUP BY ps.id, ps.name, pt.short_name, db.id, r.tournament_id, r.seq
+                GROUP BY ps.person_ptr_id, pp.name, pt.short_name, db.id, r.tournament_id, r.seq
                 ORDER BY r.tournament_id, r.seq, db.id
                 """;
 
