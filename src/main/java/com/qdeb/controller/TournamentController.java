@@ -33,7 +33,7 @@ public class TournamentController {
             
             log.info("Получен запрос на создание турнира: {} (только для ADMIN)", request.getName());
             log.info("Детали запроса - Slug: {}, Организатор: {}, Дата: {}, Уровень: {}", 
-                    request.getSlug(), request.getOrganizerName(), request.getDate(), request.getLevel());
+                    request.getSlug(), request.getOrganizerName(), request.getStartDate(), request.getLevel());
             log.info("Количество полей регистрации: {}", 
                     request.getRegistrationFields() != null ? request.getRegistrationFields().size() : 0);
             log.info("Фотография турнира: {}", tournamentPicture != null ? "загружена" : "не загружена");
