@@ -46,7 +46,8 @@ public class TournamentService {
         tournament.setOrganizerName(request.getOrganizerName());
         tournament.setOrganizerContact(request.getOrganizerContact());
         tournament.setDescription(request.getDescription());
-        tournament.setDate(request.getDate());
+        tournament.setStartDate(request.getStartDate());
+        tournament.setEndDate(request.getEndDate());
         tournament.setActive(request.isActive());
         tournament.setFee(request.getFee());
         tournament.setLevel(request.getLevel());
