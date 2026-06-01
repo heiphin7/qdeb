@@ -100,13 +100,25 @@ public class EloRatingService {
             }
         }
 
+        Map<Long, Double> avgSpeechMap = new HashMap<>();
+        tabbycatJdbcTemplate.query("""
+                SELECT ss.speaker_id, ROUND(AVG(ss.score)::numeric, 1) as avg_speech
+                FROM results_speakerscore ss
+                JOIN results_ballotsubmission bs ON ss.ballot_submission_id = bs.id
+                WHERE bs.confirmed = true AND NOT COALESCE(ss.ghost, false)
+                GROUP BY ss.speaker_id
+                """, rs -> {
+            avgSpeechMap.put(rs.getLong("speaker_id"), rs.getDouble("avg_speech"));
+        });
+
         return ratings.entrySet().stream()
                 .map(e -> new SpeakerRatingDto(
                         e.getKey(),
                         names.get(e.getKey()),
                         teams.get(e.getKey()),
                         Math.round(e.getValue()[0] * 10.0) / 10.0,
-                        (int) e.getValue()[1]
+                        (int) e.getValue()[1],
+                        avgSpeechMap.getOrDefault(e.getKey(), 0.0)
                 ))
                 .sorted(Comparator.comparingDouble(SpeakerRatingDto::getRating).reversed())
                 .collect(Collectors.toList());
