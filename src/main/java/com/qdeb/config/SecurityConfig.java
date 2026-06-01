@@ -86,6 +86,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/{username}").permitAll()
                 .requestMatchers("/api/tournaments").permitAll()
                 .requestMatchers("/api/tournaments/{slug}").permitAll()
+                .requestMatchers("/api/rating/**").permitAll()
 
                 // Остальное — по JWT
                 .anyRequest().authenticated()
