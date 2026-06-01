@@ -11,6 +11,7 @@ services:
       - postgres
     networks:
       - qdeb-network
+      - tabbycat_default
 
   postgres:
     image: postgres:15
@@ -28,6 +29,8 @@ services:
 networks:
   qdeb-network:
     driver: bridge
+  tabbycat_default:
+    external: true
 
 volumes:
   postgres_data:
